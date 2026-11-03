@@ -267,7 +267,7 @@ export function getClientScript(): string {
               '</div>' +
             '</div>' +
           '</div>' +
-          '<div class="summary-right" onclick="event.stopPropagation();">' +
+          '<div class="summary-right">' +
             switchBtn +
             '<span class="drawer-toggle-icon" data-action="toggleExpand" data-email="' + esc(emailLower) + '">&#x25bc;</span>' +
           '</div>' +
@@ -571,13 +571,21 @@ export function getClientScript(): string {
     } else if (act === "refreshAll") {
       post("refreshQuotas");
     } else if (act === "forceRotate") {
-      post("refreshQuotas");
+      actionEl.textContent = "⏳ Đang đổi...";
+      post("forceRotate");
     } else if (act === "togglePrivacy") {
       hideEmail = !hideEmail;
       post("updateConfig", { hideEmail: hideEmail });
     } else if (act === "selectAccount") {
       var emailSel = actionEl.getAttribute("data-email");
-      if (emailSel) post("selectAccount", emailSel);
+      if (emailSel) {
+        actionEl.textContent = "⏳...";
+        actionEl.setAttribute("disabled", "true");
+        if (state) state.activeEmail = emailSel;
+        renderSpotlight();
+        renderAccountDeck();
+        post("selectAccount", emailSel);
+      }
     } else if (act === "refreshAccount") {
       var emailRef = actionEl.getAttribute("data-email");
       if (emailRef) post("refreshAccount", emailRef);

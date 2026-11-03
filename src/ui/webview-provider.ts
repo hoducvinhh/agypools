@@ -146,10 +146,15 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
             await this.quotaMonitor.pollAllAccounts();
             this.refresh();
             break;
+          case "forceRotate":
+            await this.quotaMonitor.pollAllAccounts();
+            await this.tokenManager.autoSelectHighestQuota(this.quotaMonitor.getAllQuotas(), "manual_force_rotate");
+            this.postState();
+            break;
           case "selectAccount":
             if (message.payload) {
               await this.tokenManager.selectAccount(message.payload);
-              this.refresh();
+              this.postState();
             }
             break;
           case "toggleAccount":

@@ -28,6 +28,7 @@ export type WebviewMessage =
   | { action: "refreshAccount"; payload: string }
   | { action: "removeAccount"; payload: string }
   | { action: "clearLogs"; payload?: undefined }
+  | { action: "forceRotate"; payload?: undefined }
   | { action: "updateConfig"; payload: Partial<AgyPoolConfig> }
   | { action: "recalculateStats"; payload?: undefined }
   | { action: "exportPool"; payload?: undefined }
