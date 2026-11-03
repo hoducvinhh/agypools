@@ -109,16 +109,6 @@ export function getClientScript(): string {
       statusText.style.color = (config.enabled !== false) ? "var(--accent-emerald)" : "var(--text-muted)";
     }
 
-    var qMode = config.quotaMode || "5h";
-    var modePills = document.querySelectorAll(".mode-pill");
-    modePills.forEach(function(pill) {
-      if (pill.getAttribute("data-mode") === qMode) {
-        pill.classList.add("active");
-      } else {
-        pill.classList.remove("active");
-      }
-    });
-
     var avatarEl = document.getElementById("spotlight-avatar");
     var emailEl = document.getElementById("spotlight-email");
     var tierTagEl = document.getElementById("spotlight-tier-tag");
@@ -228,7 +218,6 @@ export function getClientScript(): string {
     var activeEmail = ((state && state.activeEmail) || "").toLowerCase();
     var quotas = (state && state.quotas) || {};
     var config = (state && state.config) || {};
-    var qMode = config.quotaMode || "5h";
 
     if (!accounts.length) {
       container.innerHTML = '<div class="empty-deck">Chưa có tài khoản nào trong pool.<br><br><button class="btn btn-primary" data-action="addAccount">+ Thêm Tài Khoản Đầu Tiên</button></div>';
@@ -244,10 +233,8 @@ export function getClientScript(): string {
       var afams = Array.isArray(aq.families) ? aq.families : [];
       var agem = afams.find(function(f) { return f.key === "gemini"; });
       var p5h = agem ? (agem.limit5h ? agem.limit5h.percent : (agem.percent || 100)) : 100;
-      var pWk = agem ? (agem.limitWeekly ? agem.limitWeekly.percent : 100) : 100;
-      var score = qMode === "weekly" ? pWk : (qMode === "balanced" ? Math.min(p5h, pWk) : p5h);
-      if (score > maxScore) {
-        maxScore = score;
+      if (p5h > maxScore) {
+        maxScore = p5h;
         maxEmail = (a.email || "").toLowerCase();
       }
     });
@@ -301,10 +288,10 @@ export function getClientScript(): string {
       var dispName = hideEmail ? maskEmail(email) : (acc.alias || email);
       var initial = (acc.alias ? acc.alias[0] : email[0] || "G").toUpperCase();
 
-      var gem5hCls = gem5hPct < 20 ? "danger" : gem5hPct < 40 ? "warn" : "gemini";
-      var gemWkCls = gemWkPct < 20 ? "danger" : gemWkPct < 40 ? "warn" : "gemini";
-      var claude5hCls = claude5hPct < 20 ? "danger" : claude5hPct < 40 ? "warn" : "claude";
-      var claudeWkCls = claudeWkPct < 20 ? "danger" : claudeWkPct < 40 ? "warn" : "claude";
+      var gem5hCls = gem5hPct < 20 ? "danger" : gem5hPct < 40 ? "warn" : "gemini-5h";
+      var gemWkCls = gemWkPct < 20 ? "danger" : gemWkPct < 40 ? "warn" : "gemini-7d";
+      var claude5hCls = claude5hPct < 20 ? "danger" : claude5hPct < 40 ? "warn" : "claude-5h";
+      var claudeWkCls = claudeWkPct < 20 ? "danger" : claudeWkPct < 40 ? "warn" : "claude-7d";
 
       var switchBtn = (!isAct && !isDis)
         ? '<button class="btn-switch-sm" data-action="selectAccount" data-email="' + esc(email) + '" title="Chuyển ngay sang tài khoản này">⚡ Switch</button>'
@@ -699,21 +686,6 @@ export function getClientScript(): string {
     } else if (act === "togglePrivacy") {
       hideEmail = !hideEmail;
       post("updateConfig", { hideEmail: hideEmail });
-    } else if (act === "setQuotaMode") {
-      var qm = actionEl.getAttribute("data-mode");
-      if (qm) {
-        if (!state) state = {};
-        if (!state.config) state.config = {};
-        state.config.quotaMode = qm;
-        var pBtns = document.querySelectorAll(".mode-pill");
-        pBtns.forEach(function(b) {
-          if (b.getAttribute("data-mode") === qm) b.classList.add("active");
-          else b.classList.remove("active");
-        });
-        post("setQuotaMode", qm);
-        renderSpotlight();
-        renderAccountDeck();
-      }
     } else if (act === "selectAccount") {
       var emailSel = actionEl.getAttribute("data-email");
       if (emailSel) {

@@ -211,16 +211,6 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
               this.refresh();
             }
             break;
-          case "setQuotaMode":
-            if (message.payload) {
-              await this.tokenManager.updateConfig({ quotaMode: message.payload });
-              const rotated = await this.tokenManager.autoSelectHighestQuota(this.quotaMonitor.getAllQuotas(), "quota_mode_change");
-              if (rotated) {
-                void vscode.window.showInformationMessage(`AgyPool: Đã chuyển sang ${rotated.email} (Chế độ Quota: ${message.payload})`);
-              }
-              this.refresh();
-            }
-            break;
           case "recalculateStats":
             if (this.statsManager) {
               await this.statsManager.resetAndRecalculate(BRAIN_DIR);

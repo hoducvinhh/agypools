@@ -8,24 +8,8 @@ export function renderSettingsTab(): string {
     <div class="strat-card-option selected" data-strategy="auto_highest">
       <div class="strat-radio"></div>
       <div class="strat-body">
-        <div class="strat-title">⚡ Tối Đa Quota 5h (Auto Highest 5h)</div>
-        <div class="strat-desc">Luôn ưu tiên chuyển ngay sang tài khoản có quota chu kỳ 5h cao nhất. Thích hợp cho nhu cầu cày code cường độ cao liên tục.</div>
-      </div>
-    </div>
-
-    <div class="strat-card-option" data-strategy="auto_highest_weekly">
-      <div class="strat-radio"></div>
-      <div class="strat-body">
-        <div class="strat-title">📅 Tối Đa Quota 7 Ngày (Weekly Limit)</div>
-        <div class="strat-desc">Ưu tiên tài khoản còn nhiều hạn mức tuần (7 ngày) nhất, bảo vệ tài khoản sắp cạn quota tuần không bị chặn dài ngày.</div>
-      </div>
-    </div>
-
-    <div class="strat-card-option" data-strategy="balanced">
-      <div class="strat-radio"></div>
-      <div class="strat-body">
-        <div class="strat-title">⚖️ Quota Cân Bằng (Balanced 5h & 7d)</div>
-        <div class="strat-desc">Tính toán dựa trên điểm nhỏ nhất giữa quota 5h và quota tuần, đảm bảo sử dụng hài hòa không bị cạn bất kỳ hạn mức nào.</div>
+        <div class="strat-title">⚡ Tối Đa Quota (Auto Highest)</div>
+        <div class="strat-desc">Luôn ưu tiên chuyển ngay sang tài khoản có quota dồi dào nhất. Tự động luân chuyển mượt mà khi tài khoản hiện tại giảm quota.</div>
       </div>
     </div>
 

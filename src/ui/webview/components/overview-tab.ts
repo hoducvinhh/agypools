@@ -77,16 +77,6 @@ export function renderOverviewTab(): string {
     </div>
   </div>
 
-  <!-- Quota Mode Selector Toolbar -->
-  <div class="quota-mode-toolbar">
-    <span class="quota-mode-label">Chế độ Quota:</span>
-    <div class="quota-mode-pills">
-      <button class="mode-pill active" data-action="setQuotaMode" data-mode="5h" title="Ưu tiên theo hạn mức ngắn 5 giờ">⚡ 5 Giờ</button>
-      <button class="mode-pill" data-action="setQuotaMode" data-mode="weekly" title="Ưu tiên theo hạn mức tuần 7 ngày">📅 7 Ngày</button>
-      <button class="mode-pill" data-action="setQuotaMode" data-mode="balanced" title="Cân bằng an toàn giữa 5 giờ và 7 ngày">⚖️ Cân Bằng</button>
-    </div>
-  </div>
-
   <!-- Search & Health Filters -->
   <div class="deck-filter-bar">
     <div class="search-input-box">
