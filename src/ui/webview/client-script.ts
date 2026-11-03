@@ -230,20 +230,8 @@ export function getClientScript(): string {
       var dispName = hideEmail ? maskEmail(email) : (acc.alias || email);
       var initial = (acc.alias ? acc.alias[0] : email[0] || "G").toUpperCase();
 
-      var gemBarGradient = gemPct < 20
-        ? "linear-gradient(90deg, #e11d48, #f43f5e)"
-        : gemPct < 40
-        ? "linear-gradient(90deg, #d97706, #f59e0b)"
-        : "linear-gradient(90deg, #0284c7, #38bdf8)";
-
-      var claudeBarGradient = claudePct < 20
-        ? "linear-gradient(90deg, #e11d48, #f43f5e)"
-        : claudePct < 40
-        ? "linear-gradient(90deg, #d97706, #f59e0b)"
-        : "linear-gradient(90deg, #9333ea, #c084fc)";
-
-      var gemGlow = gemPct < 20 ? "0 0 6px rgba(244,63,94,0.6)" : gemPct < 40 ? "0 0 6px rgba(245,158,11,0.6)" : "0 0 6px rgba(56,189,248,0.6)";
-      var claudeGlow = claudePct < 20 ? "0 0 6px rgba(244,63,94,0.6)" : claudePct < 40 ? "0 0 6px rgba(245,158,11,0.6)" : "0 0 6px rgba(192,132,252,0.6)";
+      var gemCls = gemPct < 20 ? "mini-bar-fill danger" : gemPct < 40 ? "mini-bar-fill warn" : "mini-bar-fill gemini";
+      var claudeCls = claudePct < 20 ? "mini-bar-fill danger" : claudePct < 40 ? "mini-bar-fill warn" : "mini-bar-fill claude";
 
       var switchBtn = (!isAct && !isDis)
         ? '<button class="btn-switch-sm" data-action="selectAccount" data-email="' + esc(email) + '" title="Chuyển ngay sang tài khoản này">⚡ Switch</button>'
@@ -274,8 +262,8 @@ export function getClientScript(): string {
             '<div class="acc-headline">' +
               '<div class="acc-name-txt" title="' + esc(email) + '">' + esc(dispName) + '</div>' +
               '<div class="acc-mini-bars">' +
-                '<span class="mini-bar-unit"><strong style="color:var(--cyan-gemini);">G:</strong><span class="mini-bar-track"><span class="mini-bar-fill" style="width:' + gemPct + '%;background:' + gemBarGradient + ';box-shadow:' + gemGlow + ';"></span></span><span style="color:var(--text-main);">' + gemPct + '%</span></span>' +
-                '<span class="mini-bar-unit"><strong style="color:var(--purple-claude);">C:</strong><span class="mini-bar-track"><span class="mini-bar-fill" style="width:' + claudePct + '%;background:' + claudeBarGradient + ';box-shadow:' + claudeGlow + ';"></span></span><span style="color:var(--text-main);">' + claudePct + '%</span></span>' +
+                '<span class="mini-bar-unit"><strong style="color:#38bdf8;font-size:12px;">G:</strong><span class="mini-bar-track"><span class="' + gemCls + '" style="width:' + gemPct + '%;"></span></span><span style="color:#f8fafc;font-size:12px;font-weight:700;">' + gemPct + '%</span></span>' +
+                '<span class="mini-bar-unit"><strong style="color:#c084fc;font-size:12px;">C:</strong><span class="mini-bar-track"><span class="' + claudeCls + '" style="width:' + claudePct + '%;"></span></span><span style="color:#f8fafc;font-size:12px;font-weight:700;">' + claudePct + '%</span></span>' +
               '</div>' +
             '</div>' +
           '</div>' +

@@ -310,7 +310,14 @@ export function activate(context: vscode.ExtensionContext): ExtensionExports {
 
   context.subscriptions.push(
     // Primary AgyPool Commands
-    vscode.commands.registerCommand("agypool.openPanel", () => void vscode.commands.executeCommand("agypool.accounts.focus")),
+    vscode.commands.registerCommand("agypool.openPanel", () => {
+      webviewProvider?.forceReloadHtml();
+      void vscode.commands.executeCommand("agypool.accounts.focus");
+    }),
+    vscode.commands.registerCommand("agypool.reloadWebview", () => {
+      webviewProvider?.forceReloadHtml();
+      void vscode.window.showInformationMessage("AgyPool: Webview reloaded");
+    }),
     vscode.commands.registerCommand("agypool.enable", async () => {
       await tokenManager?.updateConfig({ enabled: true });
       vscode.window.showInformationMessage("AgyPool: Extension enabled");

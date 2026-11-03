@@ -57,6 +57,12 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
     }, 150);
   }
 
+  public forceReloadHtml(): void {
+    if (this.view) {
+      this.view.webview.html = this.getHtmlForWebview();
+    }
+  }
+
   private getCurrentStateData(): WebviewStateData {
     const accounts = this.tokenManager.getAccounts();
     const activeEmail = this.tokenManager.getActiveEmail();

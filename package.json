@@ -152,7 +152,8 @@
     "watch": "node esbuild.js --watch",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --config oxlint.config.mjs",
-    "package": "bun run compile:prod && vsce package --no-dependencies --no-rewrite-relative-links"
+    "package": "npm run compile:prod && vsce package --no-dependencies --no-rewrite-relative-links",
+    "publish:ovsx": "npm run compile:prod && ovsx publish --no-dependencies"
   },
   "devDependencies": {
     "@oxlint/plugins": "^1.85.0",
