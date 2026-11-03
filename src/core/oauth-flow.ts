@@ -306,7 +306,7 @@ function buildSuccessHtml(email: string): string {
     <div class="auto-close">Tự động đóng sau <span id="sec">5</span> giây...</div>
 
     <div class="footer">
-      <span>AgyPool v1.4.2</span> • Tác giả: <span>Hồ Đức Vinh</span>
+      <span>AgyPool v1.4.3</span> • Tác giả: <span>Hồ Đức Vinh</span>
     </div>
   </div>
 

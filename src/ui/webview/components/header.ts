@@ -12,7 +12,7 @@ export function renderHeader(): string {
     <div class="brand-meta">
       <div class="brand-name">
         <span>AGYPOOL</span>
-        <span style="font-size:8px;font-weight:700;color:var(--cyan-gemini);background:rgba(56,189,248,0.15);padding:1px 4px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">NEXUS</span>
+        <span class="brand-ver-badge">v1.4.3</span>
       </div>
       <div class="brand-sub">Hồ Đức Vinh • Antigravity</div>
     </div>

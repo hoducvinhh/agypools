@@ -84,7 +84,18 @@ body {
   color: #fff;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+}
+.brand-ver-badge {
+  font-size: 8px;
+  font-weight: 800;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.16);
+  padding: 1.5px 5px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  letter-spacing: 0.4px;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
 }
 .brand-sub {
   font-size: 8.5px;
@@ -255,15 +266,26 @@ body {
 
 /* ==================== Tab 1: Active Engine Spotlight ==================== */
 .spotlight-card {
-  background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, var(--bg-card) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  border-radius: 8px;
-  padding: 9px 10px;
+  position: relative;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(13, 19, 31, 0.9) 60%, rgba(56, 189, 248, 0.08) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  border-radius: 10px;
+  padding: 10px 11px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.12);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(16, 185, 129, 0.18);
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.8), rgba(16, 185, 129, 0.8), transparent);
 }
 .spotlight-top {
   display: flex;
