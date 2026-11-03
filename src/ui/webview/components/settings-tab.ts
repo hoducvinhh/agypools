@@ -25,7 +25,7 @@ export function renderSettingsTab(): string {
       <div class="strat-radio"></div>
       <div class="strat-body">
         <div class="strat-title">🔄 Luân Chuyển Đều (Round Robin)</div>
-        <div class="strat-desc">Xoay vòng lần lượt qua từng tài khoản lành lặn trong pool. Giúp cân bằng thời gian hồi phục đều đặn cho tất cả tài khoản.</div>
+        <div class="strat-desc">Xoay vòng lần lượt qua từng tài khoản lành lặn trong pool. Giúp phân bổ thời gian hồi phục quota đồng đều cho tất cả tài khoản.</div>
       </div>
     </div>
   </div>
