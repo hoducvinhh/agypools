@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import type { LogManager } from "../core/log-manager.js";
 import type { QuotaMonitor } from "../core/quota-monitor.js";
-import { BRAIN_DIR } from "../core/sqlite-utils.js";
 import type { StatsManager } from "../core/stats-manager.js";
 import type { TokenManager } from "../core/token-manager.js";
 import type { UsageTracker } from "../core/usage-tracker.js";
@@ -202,7 +201,7 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
             break;
           case "recalculateStats":
             if (this.statsManager) {
-              await this.statsManager.resetAndRecalculate(BRAIN_DIR);
+              await this.statsManager.resetAndRecalculate();
               this.usageTracker?.resetProcessedLines();
               this.refresh();
             }

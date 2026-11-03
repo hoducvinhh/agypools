@@ -258,10 +258,10 @@ export function aggregateBlockTokens(
 
   for (const turn of turns) {
     if (turn.idx < startTurnIdx || turn.idx > endTurnIdx) continue;
-    result.inputTokens = turn.cachedInputTokens + turn.newInputTokens;
+    result.inputTokens += turn.cachedInputTokens + turn.newInputTokens;
     result.outputTokens += turn.outputTokens;
-    result.cacheHitTokens = turn.cachedInputTokens;
-    result.cacheMissTokens = turn.newInputTokens;
+    result.cacheHitTokens += turn.cachedInputTokens;
+    result.cacheMissTokens += turn.newInputTokens;
     result.thinkingTokens += turn.thinkingTokens || 0;
     result.contentTokens += (turn.contentTokens || Math.max(0, turn.outputTokens - (turn.thinkingTokens || 0)));
     if (turn.model) result.model = turn.model;

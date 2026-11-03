@@ -2,7 +2,7 @@
   "name": "agypool",
   "displayName": "AgyPool - Antigravity Account Pool",
   "description": "Smart Multi-Account Pool & Quota Manager for Antigravity with Auto-Switching to Highest Quota.",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "publisher": "hoducvinhh",
   "author": "hoducvinhh",
   "license": "MIT",

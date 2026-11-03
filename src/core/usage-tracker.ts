@@ -75,7 +75,7 @@ export class UsageTracker {
     this.refresh();
     this.pollInterval = setInterval(() => this.refresh(), 10000);
     if (this.statsManager) {
-      void this.statsManager.backfillFromTranscripts(BRAIN_DIR);
+      void this.statsManager.backfillFromTranscripts();
     }
   }
 
