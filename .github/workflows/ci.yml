@@ -68,7 +68,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to Open VSX
-        if: ${{ secrets.OVSX_PAT != '' }}
-        run: bunx ovsx publish *.vsix --pat "${{ secrets.OVSX_PAT }}"
+        run: |
+          if [ -n "$OVSX_PAT" ]; then
+            bunx ovsx publish *.vsix --pat "$OVSX_PAT"
+          else
+            echo "OVSX_PAT is not set. Skipping Open VSX publication."
+          fi
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
