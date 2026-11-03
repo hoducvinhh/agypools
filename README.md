@@ -31,10 +31,10 @@ With deep hooks into Antigravity's **Unified State Sync (USS)**, **Language Serv
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="resources/ss.png" alt="AgyPool Overview Dashboard" width="750" />
+  <img src="resources/image.png" alt="AgyPool Overview Dashboard" width="750" />
   <p><em>Overview Dashboard: Account Deck, Real-time Quota Gauges & Status Indicators</em></p>
   <br/>
-  <img src="resources/ss2.png" alt="AgyPool Analytics & Telemetry" width="750" />
+  <img src="resources/image-copy.png" alt="AgyPool Analytics & Telemetry" width="750" />
   <p><em>Analytics & Telemetry: Model Token Breakdown, Latency, and Cache Hit Rates</em></p>
 </div>
 

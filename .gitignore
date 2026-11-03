@@ -19,7 +19,6 @@ scratch/
 .agents/
 .vscode-test/
 tools/
-resources/
 
 # Secrets and environment variables
 .env
