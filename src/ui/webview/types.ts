@@ -10,6 +10,7 @@ import type {
   ModelAffinity,
   MonthTokenStats,
   PoolRole,
+  QuotaMode,
   RequestStats,
   TokenBucket,
   WeekTokenStats,
@@ -30,6 +31,7 @@ export type WebviewMessage =
   | { action: "clearLogs"; payload?: undefined }
   | { action: "forceRotate"; payload?: undefined }
   | { action: "updateConfig"; payload: Partial<AgyPoolConfig> }
+  | { action: "setQuotaMode"; payload: QuotaMode }
   | { action: "recalculateStats"; payload?: undefined }
   | { action: "exportPool"; payload?: undefined }
   | { action: "importPool"; payload?: undefined };

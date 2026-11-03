@@ -20,7 +20,7 @@ export function renderOverviewTab(): string {
       </div>
     </div>
 
-    <!-- Dual Quota Micro-Gauges (Gemini & Claude) -->
+    <!-- 4-Gauge Micro-Grid (Gemini 5h, Gemini 7d, Claude 5h, Claude 7d) -->
     <div class="spotlight-gauges">
       <div class="gauge-item">
         <div class="gauge-header">
@@ -35,6 +35,17 @@ export function renderOverviewTab(): string {
 
       <div class="gauge-item">
         <div class="gauge-header">
+          <span class="gauge-lbl">Gemini (7d)</span>
+          <span class="gauge-val gemini" id="spotlight-gemini-weekly-pct">100%</span>
+        </div>
+        <div class="gauge-bar-track">
+          <div class="gauge-bar-fill gemini" id="spotlight-gemini-weekly-bar" style="width: 100%;"></div>
+        </div>
+        <div class="gauge-reset" id="spotlight-gemini-weekly-reset">Sẵn sàng</div>
+      </div>
+
+      <div class="gauge-item">
+        <div class="gauge-header">
           <span class="gauge-lbl">Claude (5h)</span>
           <span class="gauge-val claude" id="spotlight-claude-pct">100%</span>
         </div>
@@ -42,6 +53,17 @@ export function renderOverviewTab(): string {
           <div class="gauge-bar-fill claude" id="spotlight-claude-bar" style="width: 100%;"></div>
         </div>
         <div class="gauge-reset" id="spotlight-claude-reset">Sẵn sàng</div>
+      </div>
+
+      <div class="gauge-item">
+        <div class="gauge-header">
+          <span class="gauge-lbl">Claude (7d)</span>
+          <span class="gauge-val claude" id="spotlight-claude-weekly-pct">100%</span>
+        </div>
+        <div class="gauge-bar-track">
+          <div class="gauge-bar-fill claude" id="spotlight-claude-weekly-bar" style="width: 100%;"></div>
+        </div>
+        <div class="gauge-reset" id="spotlight-claude-weekly-reset">Sẵn sàng</div>
       </div>
     </div>
 
@@ -52,6 +74,16 @@ export function renderOverviewTab(): string {
         <button class="btn btn-sec" data-action="forceRotate" id="btn-force-rotate" title="Chuyển ngay sang tài khoản có quota tốt nhất">⚡ Luân Chuyển</button>
       </div>
       <button class="btn btn-sec" data-action="togglePrivacy" id="btn-privacy-toggle" title="Ẩn/Hiện địa chỉ email">Ẩn Email</button>
+    </div>
+  </div>
+
+  <!-- Quota Mode Selector Toolbar -->
+  <div class="quota-mode-toolbar">
+    <span class="quota-mode-label">Chế độ Quota:</span>
+    <div class="quota-mode-pills">
+      <button class="mode-pill active" data-action="setQuotaMode" data-mode="5h" title="Ưu tiên theo hạn mức ngắn 5 giờ">⚡ 5 Giờ</button>
+      <button class="mode-pill" data-action="setQuotaMode" data-mode="weekly" title="Ưu tiên theo hạn mức tuần 7 ngày">📅 7 Ngày</button>
+      <button class="mode-pill" data-action="setQuotaMode" data-mode="balanced" title="Cân bằng an toàn giữa 5 giờ và 7 ngày">⚖️ Cân Bằng</button>
     </div>
   </div>
 

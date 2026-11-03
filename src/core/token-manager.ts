@@ -12,6 +12,7 @@ import {
   type AgyPoolConfig,
   AgyPoolErrorCode,
   type PoolRole,
+  type QuotaMode,
   type RotationStrategy,
 } from "../types.js";
 import { OAuthFlow } from "./oauth-flow.js";
@@ -349,9 +350,36 @@ export class TokenManager {
     }
   }
 
-  public getEffectiveQuota(email: string, quotas: Record<string, AccountQuota>, targetModel?: string): EffectiveQuota {
+  public getEffectiveQuota(
+    email: string,
+    quotas: Record<string, AccountQuota>,
+    targetModel?: string,
+    overrideMode?: QuotaMode,
+  ): EffectiveQuota {
     const q = quotas[email.toLowerCase()];
     if (!q?.families || q.families.length === 0) return { percent: -1, resetTs: Infinity };
+
+    const strategy = this.config.rotationStrategy || "auto_highest";
+    const mode: QuotaMode = overrideMode || this.config.quotaMode || (strategy === "auto_highest_weekly" ? "weekly" : strategy === "balanced" ? "balanced" : "5h");
+
+    const computePercent = (p5h: number, pWk: number): number => {
+      if (mode === "weekly") {
+        return p5h <= 0 ? 0 : pWk;
+      }
+      if (mode === "balanced") {
+        return Math.min(p5h, pWk);
+      }
+      return pWk <= 0 ? 0 : p5h;
+    };
+
+    const resolveResetTs = (r5h?: string, rWk?: string): number => {
+      const ts5h = r5h ? Date.parse(r5h) : Infinity;
+      const tsWk = rWk ? Date.parse(rWk) : Infinity;
+      if (mode === "weekly") {
+        return Number.isNaN(tsWk) ? (Number.isNaN(ts5h) ? Infinity : ts5h) : tsWk;
+      }
+      return Number.isNaN(ts5h) ? Infinity : ts5h;
+    };
 
     const modelName = targetModel || this.usageTracker?.getActiveModel() || "";
     if (modelName) {
@@ -370,10 +398,9 @@ export class TokenManager {
         if (fam) {
           const p5h = fam.limit5h?.percent ?? fam.percent ?? 100;
           const pWk = fam.limitWeekly?.percent ?? 100;
-          const pct = pWk <= 0 ? 0 : p5h;
-          const resetStr = fam.limit5h?.resetTime ?? fam.resetTime;
-          const resetTs = resetStr ? Date.parse(resetStr) : Infinity;
-          return { percent: pct, resetTs: Number.isNaN(resetTs) ? Infinity : resetTs };
+          const pct = computePercent(p5h, pWk);
+          const resetTs = resolveResetTs(fam.limit5h?.resetTime ?? fam.resetTime, fam.limitWeekly?.resetTime);
+          return { percent: pct, resetTs };
         }
         return { percent: 0, resetTs: Infinity };
       }
@@ -383,13 +410,10 @@ export class TokenManager {
     for (const f of q.families) {
       const p5h = f.limit5h?.percent ?? f.percent ?? 100;
       const pWk = f.limitWeekly?.percent ?? 100;
-      const pct = pWk <= 0 ? 0 : p5h;
+      const pct = computePercent(p5h, pWk);
       minPct = Math.min(minPct, pct);
-      const resetTime = f.limit5h?.resetTime ?? f.resetTime;
-      if (resetTime) {
-        const ts = Date.parse(resetTime);
-        if (!Number.isNaN(ts) && ts < minResetTs) minResetTs = ts;
-      }
+      const resetTs = resolveResetTs(f.limit5h?.resetTime ?? f.resetTime, f.limitWeekly?.resetTime);
+      if (resetTs < minResetTs) minResetTs = resetTs;
     }
     return { percent: minPct, resetTs: minResetTs };
   }
@@ -425,16 +449,21 @@ export class TokenManager {
     const tierCandidates = hasUsablePaid ? paidPool : candidates;
 
     const isRateLimitFailover = reason === "rate_limit_failover";
+    const isManualOrFailover =
+      isRateLimitFailover ||
+      Boolean(reason && (reason.includes("force") || reason === "startup" || reason === "quota_mode_change" || reason === "manual_force_rotate"));
     const activeMatchesAffinity = activeAcc ? matchesModelAffinity(activeAcc, famKey) : true;
     const activeIsFreeWhenPaidAvailable = activeAcc?.tier === "free" && hasUsablePaid;
     const strategy: RotationStrategy = this.config.rotationStrategy || "auto_highest";
+    const isHighestStrategy =
+      strategy === "auto_highest" || strategy === "auto_highest_weekly" || strategy === "balanced";
 
     // 4. Timing Priority (Predictive Drain Window):
-    // Only applied in cache_optimized or round_robin modes.
-    // In "auto_highest", user wants strictly highest available quota at all times.
+    // Only applied in cache_optimized or round_robin modes when not forced.
+    // In highest quota modes, user wants strictly highest available quota at all times.
     if (
-      strategy !== "auto_highest" &&
-      !isRateLimitFailover &&
+      !isHighestStrategy &&
+      !isManualOrFailover &&
       !activeIsFreeWhenPaidAvailable &&
       activeMatchesAffinity &&
       activeInfo.percent > 5 &&
@@ -445,12 +474,12 @@ export class TokenManager {
     }
 
     // 5. Strategy Dispatch
-    if (strategy === "cache_optimized" && !isRateLimitFailover) {
+    if (strategy === "cache_optimized" && !isManualOrFailover) {
       // Sticky Cache: Stay on active account as long as it has > 15% quota, matches affinity, and is not free when paid is available
       if (!activeIsFreeWhenPaidAvailable && activeMatchesAffinity && activeInfo.percent > 15) {
         return null;
       }
-    } else if (strategy === "round_robin" && !isRateLimitFailover) {
+    } else if (strategy === "round_robin" && !isManualOrFailover) {
       // Round Robin with Timing Priority: prioritize imminent refill candidate (<= 45m) if one exists
       const imminentCandidate = tierCandidates.find((a) => {
         const qInfo = this.getEffectiveQuota(a.email, quotas, model);
@@ -489,7 +518,7 @@ export class TokenManager {
       if (info.percent <= 0) continue;
 
       const timeToReset = info.resetTs - now;
-      const isImminent = strategy !== "auto_highest" && timeToReset > 0 && timeToReset <= IMMINENT_RESET_MS && info.percent > 10;
+      const isImminent = !isHighestStrategy && timeToReset > 0 && timeToReset <= IMMINENT_RESET_MS && info.percent > 10;
       const tierBonus = acc.tier === "ultra" ? 2 : acc.tier === "pro" ? 1 : 0;
       // In auto_highest: pure absolute quota percentage is king, tier is minor tie-breaker
       const score = info.percent + (isImminent ? 1000 : 0) + tierBonus / 10;
@@ -503,7 +532,7 @@ export class TokenManager {
     }
 
     const activeTimeToReset = activeInfo.resetTs - now;
-    const isActiveImminent = strategy !== "auto_highest" && activeTimeToReset > 0 && activeTimeToReset <= IMMINENT_RESET_MS && activeInfo.percent > 10;
+    const isActiveImminent = !isHighestStrategy && activeTimeToReset > 0 && activeTimeToReset <= IMMINENT_RESET_MS && activeInfo.percent > 10;
     const activeTierBonus = activeAcc?.tier === "ultra" ? 2 : activeAcc?.tier === "pro" ? 1 : 0;
     const activeScore = activeMatchesAffinity && !activeIsFreeWhenPaidAvailable
       ? activeInfo.percent + (isActiveImminent ? 1000 : 0) + activeTierBonus / 10
@@ -521,6 +550,25 @@ export class TokenManager {
     }
 
     if (bestAcc.email.toLowerCase() === activeEmail) {
+      if (isManualOrFailover) {
+        // User requested force rotation: pick the best alternative candidate
+        const altCandidates = tierCandidates.filter((a) => a.email.toLowerCase() !== activeEmail);
+        if (altCandidates.length > 0) {
+          altCandidates.sort((a, b) => {
+            const qa = this.getEffectiveQuota(a.email, quotas, model).percent;
+            const qb = this.getEffectiveQuota(b.email, quotas, model).percent;
+            return qb - qa;
+          });
+          const alt = altCandidates[0];
+          if (alt) {
+            const altInfo = this.getEffectiveQuota(alt.email, quotas, model);
+            if (altInfo.percent > 10) {
+              this.log(`[AutoRotate (Force Rotate)] Cycling to next best account: ${alt.email} (${altInfo.percent}%)`);
+              return this.selectAccount(alt.email);
+            }
+          }
+        }
+      }
       if (isIdeDesynced || this.lastSyncedEmail?.toLowerCase() !== activeEmail) {
         this.log(`[AutoRotate] Best account ${bestAcc.email} matches active pool account, but IDE is on ${ideEmail || "unknown"}. Re-syncing credentials...`);
         return this.selectAccount(bestAcc.email);
@@ -528,7 +576,7 @@ export class TokenManager {
       return null;
     }
 
-    if (!isRateLimitFailover && bestScore <= activeScore) {
+    if (!isManualOrFailover && bestScore <= activeScore) {
       if (isIdeDesynced || this.lastSyncedEmail?.toLowerCase() !== activeEmail) {
         this.log(`[AutoRotate] Re-syncing active account ${activeEmail} to IDE (IDE currently on ${ideEmail || "unknown"})...`);
         return this.selectAccount(activeEmail);

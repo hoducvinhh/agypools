@@ -41,17 +41,21 @@ export function getClientScript(): string {
   }
 
   function fmtTime(iso) {
-    if (!iso) return "sẵn sàng";
+    if (!iso) return "Sẵn sàng";
     var d = new Date(iso).getTime() - Date.now();
-    if (d <= 0 || isNaN(d)) return "sẵn sàng";
+    if (d <= 0 || isNaN(d)) return "Sẵn sàng";
+    var dt = new Date(iso);
+    var hrsPad = ('0' + dt.getHours()).slice(-2);
+    var minsPad = ('0' + dt.getMinutes()).slice(-2);
+    var timeStr = hrsPad + ':' + minsPad;
     var days = Math.floor(d / 864e5);
     var hrs = Math.floor((d % 864e5) / 36e5);
     var mins = Math.floor((d % 36e5) / 6e4);
     var secs = Math.floor((d % 6e4) / 1000);
-    if (days > 0) return "resets " + days + "d " + hrs + "h";
-    if (hrs > 0) return "resets " + hrs + "h " + mins + "m";
-    if (mins > 0) return "resets " + mins + "m " + secs + "s";
-    return "resets " + secs + "s";
+    if (days > 0) return days + "d " + hrs + "h (" + timeStr + ")";
+    if (hrs > 0) return hrs + "h " + mins + "m (" + timeStr + ")";
+    if (mins > 0) return mins + "m (" + timeStr + ")";
+    return secs + "s";
   }
 
   function post(action, payload) {
@@ -105,19 +109,39 @@ export function getClientScript(): string {
       statusText.style.color = (config.enabled !== false) ? "var(--accent-emerald)" : "var(--text-muted)";
     }
 
+    var qMode = config.quotaMode || "5h";
+    var modePills = document.querySelectorAll(".mode-pill");
+    modePills.forEach(function(pill) {
+      if (pill.getAttribute("data-mode") === qMode) {
+        pill.classList.add("active");
+      } else {
+        pill.classList.remove("active");
+      }
+    });
+
     var avatarEl = document.getElementById("spotlight-avatar");
     var emailEl = document.getElementById("spotlight-email");
     var tierTagEl = document.getElementById("spotlight-tier-tag");
     var roleTagEl = document.getElementById("spotlight-role-tag");
     var healthTagEl = document.getElementById("spotlight-health-tag");
+
     var gemPctEl = document.getElementById("spotlight-gemini-pct");
     var gemBarEl = document.getElementById("spotlight-gemini-bar");
     var gemResetEl = document.getElementById("spotlight-gemini-reset");
+
+    var gemWkPctEl = document.getElementById("spotlight-gemini-weekly-pct");
+    var gemWkBarEl = document.getElementById("spotlight-gemini-weekly-bar");
+    var gemWkResetEl = document.getElementById("spotlight-gemini-weekly-reset");
+
     var claudePctEl = document.getElementById("spotlight-claude-pct");
     var claudeBarEl = document.getElementById("spotlight-claude-bar");
     var claudeResetEl = document.getElementById("spotlight-claude-reset");
-    var privBtn = document.getElementById("btn-privacy-toggle");
 
+    var claudeWkPctEl = document.getElementById("spotlight-claude-weekly-pct");
+    var claudeWkBarEl = document.getElementById("spotlight-claude-weekly-bar");
+    var claudeWkResetEl = document.getElementById("spotlight-claude-weekly-reset");
+
+    var privBtn = document.getElementById("btn-privacy-toggle");
     if (privBtn) privBtn.textContent = hideEmail ? "Hiện Email" : "Ẩn Email";
 
     if (!activeAcc) {
@@ -128,9 +152,15 @@ export function getClientScript(): string {
       if (gemPctEl) gemPctEl.textContent = "---";
       if (gemBarEl) gemBarEl.style.width = "0%";
       if (gemResetEl) gemResetEl.textContent = "No data";
+      if (gemWkPctEl) gemWkPctEl.textContent = "---";
+      if (gemWkBarEl) gemWkBarEl.style.width = "0%";
+      if (gemWkResetEl) gemWkResetEl.textContent = "No data";
       if (claudePctEl) claudePctEl.textContent = "---";
       if (claudeBarEl) claudeBarEl.style.width = "0%";
       if (claudeResetEl) claudeResetEl.textContent = "No data";
+      if (claudeWkPctEl) claudeWkPctEl.textContent = "---";
+      if (claudeWkBarEl) claudeWkBarEl.style.width = "0%";
+      if (claudeWkResetEl) claudeWkResetEl.textContent = "No data";
       return;
     }
 
@@ -156,24 +186,31 @@ export function getClientScript(): string {
     var gemFam = fams.find(function(f) { return f.key === "gemini"; });
     var claudeFam = fams.find(function(f) { return f.key === "claude"; });
 
-    var gemPct = gemFam ? (gemFam.limit5h ? gemFam.limit5h.percent : (gemFam.percent || 100)) : 100;
-    var claudePct = claudeFam ? (claudeFam.limit5h ? claudeFam.limit5h.percent : (claudeFam.percent || 100)) : 100;
+    var gem5hPct = gemFam ? (gemFam.limit5h ? gemFam.limit5h.percent : (gemFam.percent || 100)) : 100;
+    var gem5hReset = gemFam ? (gemFam.limit5h ? gemFam.limit5h.resetTime : gemFam.resetTime) : null;
+    var gemWkPct = gemFam ? (gemFam.limitWeekly ? gemFam.limitWeekly.percent : 100) : 100;
+    var gemWkReset = gemFam ? (gemFam.limitWeekly ? gemFam.limitWeekly.resetTime : null) : null;
 
-    if (gemPctEl) gemPctEl.textContent = gemPct + "%";
-    if (gemBarEl) gemBarEl.style.width = Math.min(100, Math.max(0, gemPct)) + "%";
-    if (gemResetEl) {
-      var gResetIso = gemFam ? (gemFam.limit5h ? gemFam.limit5h.resetTime : gemFam.resetTime) : null;
-      gemResetEl.textContent = fmtTime(gResetIso);
-      gemResetEl.setAttribute("data-reset", gResetIso || "");
-    }
+    var claude5hPct = claudeFam ? (claudeFam.limit5h ? claudeFam.limit5h.percent : (claudeFam.percent || 100)) : 100;
+    var claude5hReset = claudeFam ? (claudeFam.limit5h ? claudeFam.limit5h.resetTime : claudeFam.resetTime) : null;
+    var claudeWkPct = claudeFam ? (claudeFam.limitWeekly ? claudeFam.limitWeekly.percent : 100) : 100;
+    var claudeWkReset = claudeFam ? (claudeFam.limitWeekly ? claudeFam.limitWeekly.resetTime : null) : null;
 
-    if (claudePctEl) claudePctEl.textContent = claudePct + "%";
-    if (claudeBarEl) claudeBarEl.style.width = Math.min(100, Math.max(0, claudePct)) + "%";
-    if (claudeResetEl) {
-      var cResetIso = claudeFam ? (claudeFam.limit5h ? claudeFam.limit5h.resetTime : claudeFam.resetTime) : null;
-      claudeResetEl.textContent = fmtTime(cResetIso);
-      claudeResetEl.setAttribute("data-reset", cResetIso || "");
-    }
+    if (gemPctEl) gemPctEl.textContent = gem5hPct + "%";
+    if (gemBarEl) gemBarEl.style.width = Math.min(100, Math.max(0, gem5hPct)) + "%";
+    if (gemResetEl) gemResetEl.textContent = fmtTime(gem5hReset);
+
+    if (gemWkPctEl) gemWkPctEl.textContent = gemWkPct + "%";
+    if (gemWkBarEl) gemWkBarEl.style.width = Math.min(100, Math.max(0, gemWkPct)) + "%";
+    if (gemWkResetEl) gemWkResetEl.textContent = fmtTime(gemWkReset);
+
+    if (claudePctEl) claudePctEl.textContent = claude5hPct + "%";
+    if (claudeBarEl) claudeBarEl.style.width = Math.min(100, Math.max(0, claude5hPct)) + "%";
+    if (claudeResetEl) claudeResetEl.textContent = fmtTime(claude5hReset);
+
+    if (claudeWkPctEl) claudeWkPctEl.textContent = claudeWkPct + "%";
+    if (claudeWkBarEl) claudeWkBarEl.style.width = Math.min(100, Math.max(0, claudeWkPct)) + "%";
+    if (claudeWkResetEl) claudeWkResetEl.textContent = fmtTime(claudeWkReset);
 
     var rotateBtn = document.getElementById("btn-force-rotate") || document.querySelector('[data-action="forceRotate"]');
     if (rotateBtn) {
@@ -190,11 +227,30 @@ export function getClientScript(): string {
     var accounts = (state && Array.isArray(state.accounts)) ? state.accounts : [];
     var activeEmail = ((state && state.activeEmail) || "").toLowerCase();
     var quotas = (state && state.quotas) || {};
+    var config = (state && state.config) || {};
+    var qMode = config.quotaMode || "5h";
 
     if (!accounts.length) {
       container.innerHTML = '<div class="empty-deck">Chưa có tài khoản nào trong pool.<br><br><button class="btn btn-primary" data-action="addAccount">+ Thêm Tài Khoản Đầu Tiên</button></div>';
       return;
     }
+
+    // Determine account with highest quota score
+    var maxScore = -1;
+    var maxEmail = "";
+    accounts.forEach(function(a) {
+      if (!a || a.status === "disabled") return;
+      var aq = quotas[(a.email || "").toLowerCase()] || {};
+      var afams = Array.isArray(aq.families) ? aq.families : [];
+      var agem = afams.find(function(f) { return f.key === "gemini"; });
+      var p5h = agem ? (agem.limit5h ? agem.limit5h.percent : (agem.percent || 100)) : 100;
+      var pWk = agem ? (agem.limitWeekly ? agem.limitWeekly.percent : 100) : 100;
+      var score = qMode === "weekly" ? pWk : (qMode === "balanced" ? Math.min(p5h, pWk) : p5h);
+      if (score > maxScore) {
+        maxScore = score;
+        maxEmail = (a.email || "").toLowerCase();
+      }
+    });
 
     // Filter accounts
     var qSearch = searchFilter.trim().toLowerCase();
@@ -226,18 +282,29 @@ export function getClientScript(): string {
       var isAct = emailLower === activeEmail;
       var isDis = acc.status === "disabled";
       var isExp = expandedAccounts.has(emailLower);
+      var isMax = !isDis && emailLower === maxEmail;
       var q = quotas[emailLower] || {};
       var fams = Array.isArray(q.families) ? q.families : [];
       var gemFam = fams.find(function(f) { return f.key === "gemini"; });
       var claudeFam = fams.find(function(f) { return f.key === "claude"; });
-      var gemPct = gemFam ? (gemFam.limit5h ? gemFam.limit5h.percent : (gemFam.percent || 100)) : 100;
-      var claudePct = claudeFam ? (claudeFam.limit5h ? claudeFam.limit5h.percent : (claudeFam.percent || 100)) : 100;
+
+      var gem5hPct = gemFam ? (gemFam.limit5h ? gemFam.limit5h.percent : (gemFam.percent || 100)) : 100;
+      var gem5hReset = gemFam ? (gemFam.limit5h ? gemFam.limit5h.resetTime : gemFam.resetTime) : null;
+      var gemWkPct = gemFam ? (gemFam.limitWeekly ? gemFam.limitWeekly.percent : 100) : 100;
+      var gemWkReset = gemFam ? (gemFam.limitWeekly ? gemFam.limitWeekly.resetTime : null) : null;
+
+      var claude5hPct = claudeFam ? (claudeFam.limit5h ? claudeFam.limit5h.percent : (claudeFam.percent || 100)) : 100;
+      var claude5hReset = claudeFam ? (claudeFam.limit5h ? claudeFam.limit5h.resetTime : claudeFam.resetTime) : null;
+      var claudeWkPct = claudeFam ? (claudeFam.limitWeekly ? claudeFam.limitWeekly.percent : 100) : 100;
+      var claudeWkReset = claudeFam ? (claudeFam.limitWeekly ? claudeFam.limitWeekly.resetTime : null) : null;
 
       var dispName = hideEmail ? maskEmail(email) : (acc.alias || email);
       var initial = (acc.alias ? acc.alias[0] : email[0] || "G").toUpperCase();
 
-      var gemCls = gemPct < 20 ? "mini-bar-fill danger" : gemPct < 40 ? "mini-bar-fill warn" : "mini-bar-fill gemini";
-      var claudeCls = claudePct < 20 ? "mini-bar-fill danger" : claudePct < 40 ? "mini-bar-fill warn" : "mini-bar-fill claude";
+      var gem5hCls = gem5hPct < 20 ? "danger" : gem5hPct < 40 ? "warn" : "gemini";
+      var gemWkCls = gemWkPct < 20 ? "danger" : gemWkPct < 40 ? "warn" : "gemini";
+      var claude5hCls = claude5hPct < 20 ? "danger" : claude5hPct < 40 ? "warn" : "claude";
+      var claudeWkCls = claudeWkPct < 20 ? "danger" : claudeWkPct < 40 ? "warn" : "claude";
 
       var switchBtn = (!isAct && !isDis)
         ? '<button class="btn-switch-sm" data-action="selectAccount" data-email="' + esc(email) + '" title="Chuyển ngay sang tài khoản này">⚡ Switch</button>'
@@ -260,16 +327,31 @@ export function getClientScript(): string {
 
       var cardCls = "acc-card-nexus" + (isAct ? " is-active" : "") + (isDis ? " is-disabled" : "") + (isExp ? " expanded" : "");
 
+      var activeTag = isAct ? '<span class="tag-badge tag-active">. ACTIVE</span>' : '';
+      var maxTag = isMax ? '<span class="tag-badge tag-max">👑 MAX</span>' : '';
+      var tierTag = '<span class="tag-badge tag-tier">' + esc((acc.tier || "pro").toUpperCase()) + '</span>';
+      var affinityTag = '<span class="tag-badge" style="background:rgba(255,255,255,0.06);color:var(--text-dim);border:1px solid var(--glass-border);">' + esc((acc.affinity || "all").toUpperCase()) + '</span>';
+      var roleTag = '<span class="tag-badge" style="background:rgba(255,255,255,0.06);color:var(--text-dim);border:1px solid var(--glass-border);">' + esc((acc.role || "primary").toUpperCase()) + '</span>';
+
       return '<div class="' + cardCls + '" data-account="' + esc(emailLower) + '">' +
         '<!-- Tier 1: Summary Row -->' +
         '<div class="acc-row-summary" data-action="toggleExpand" data-email="' + esc(emailLower) + '">' +
           '<div class="summary-left">' +
             '<div class="acc-avatar-sm">' + esc(initial) + '</div>' +
             '<div class="acc-headline">' +
-              '<div class="acc-name-txt" title="' + esc(email) + '">' + esc(dispName) + '</div>' +
+              '<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">' +
+                '<span class="acc-name-txt" title="' + esc(email) + '">' + esc(dispName) + '</span>' +
+                tierTag +
+                activeTag +
+                maxTag +
+                affinityTag +
+                roleTag +
+              '</div>' +
               '<div class="acc-mini-bars">' +
-                '<span class="mini-bar-unit"><strong style="color:#38bdf8;font-size:12px;">G:</strong><span class="mini-bar-track"><span class="' + gemCls + '" style="width:' + gemPct + '%;"></span></span><span style="color:#f8fafc;font-size:12px;font-weight:700;">' + gemPct + '%</span></span>' +
-                '<span class="mini-bar-unit"><strong style="color:#c084fc;font-size:12px;">C:</strong><span class="mini-bar-track"><span class="' + claudeCls + '" style="width:' + claudePct + '%;"></span></span><span style="color:#f8fafc;font-size:12px;font-weight:700;">' + claudePct + '%</span></span>' +
+                '<span class="mini-bar-unit"><strong style="color:#38bdf8;font-size:12px;">G(5h):</strong><span class="mini-bar-track"><span class="mini-bar-fill ' + gem5hCls + '" style="width:' + gem5hPct + '%;"></span></span><span style="color:#f8fafc;font-size:12px;font-weight:700;">' + gem5hPct + '%</span></span>' +
+                '<span class="mini-bar-unit"><strong style="color:#0284c7;font-size:12px;">G(7d):</strong><span class="mini-bar-track"><span class="mini-bar-fill ' + gemWkCls + '" style="width:' + gemWkPct + '%;"></span></span><span style="color:#f8fafc;font-size:12px;font-weight:700;">' + gemWkPct + '%</span></span>' +
+                '<span class="mini-bar-unit"><strong style="color:#c084fc;font-size:12px;">C(5h):</strong><span class="mini-bar-track"><span class="mini-bar-fill ' + claude5hCls + '" style="width:' + claude5hPct + '%;"></span></span><span style="color:#f8fafc;font-size:12px;font-weight:700;">' + claude5hPct + '%</span></span>' +
+                '<span class="mini-bar-unit"><strong style="color:#9333ea;font-size:12px;">C(7d):</strong><span class="mini-bar-track"><span class="mini-bar-fill ' + claudeWkCls + '" style="width:' + claudeWkPct + '%;"></span></span><span style="color:#f8fafc;font-size:12px;font-weight:700;">' + claudeWkPct + '%</span></span>' +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -281,6 +363,33 @@ export function getClientScript(): string {
 
         '<!-- Tier 2: Expandable Drawer -->' +
         '<div class="acc-row-drawer">' +
+          '<!-- 4 Quota Bars (Gemini 5h & 7d, Claude 5h & 7d) -->' +
+          '<div class="drawer-quota-bars">' +
+            '<div class="quota-bar-row">' +
+              '<span class="quota-bar-name">Gemini (5h)</span>' +
+              '<span class="quota-reset-badge">' + esc(fmtTime(gem5hReset)) + '</span>' +
+              '<span class="quota-bar-track"><span class="quota-bar-fill ' + gem5hCls + '" style="width:' + gem5hPct + '%;"></span></span>' +
+              '<span class="quota-bar-pct">' + gem5hPct + '%</span>' +
+            '</div>' +
+            '<div class="quota-bar-row">' +
+              '<span class="quota-bar-name">Gemini (7d)</span>' +
+              '<span class="quota-reset-badge">' + esc(fmtTime(gemWkReset)) + '</span>' +
+              '<span class="quota-bar-track"><span class="quota-bar-fill ' + gemWkCls + '" style="width:' + gemWkPct + '%;"></span></span>' +
+              '<span class="quota-bar-pct">' + gemWkPct + '%</span>' +
+            '</div>' +
+            '<div class="quota-bar-row">' +
+              '<span class="quota-bar-name">Claude (5h)</span>' +
+              '<span class="quota-reset-badge">' + esc(fmtTime(claude5hReset)) + '</span>' +
+              '<span class="quota-bar-track"><span class="quota-bar-fill ' + claude5hCls + '" style="width:' + claude5hPct + '%;"></span></span>' +
+              '<span class="quota-bar-pct">' + claude5hPct + '%</span>' +
+            '</div>' +
+            '<div class="quota-bar-row">' +
+              '<span class="quota-bar-name">Claude (7d)</span>' +
+              '<span class="quota-reset-badge">' + esc(fmtTime(claudeWkReset)) + '</span>' +
+              '<span class="quota-bar-track"><span class="quota-bar-fill ' + claudeWkCls + '" style="width:' + claudeWkPct + '%;"></span></span>' +
+              '<span class="quota-bar-pct">' + claudeWkPct + '%</span>' +
+            '</div>' +
+          '</div>' +
           '<div class="drawer-meta-chips">' +
             '<span class="chip-interactive" data-action="toggleAffinity" data-email="' + esc(email) + '" data-affinity="' + esc(acc.affinity || "all") + '" title="Chuyển model affinity (Gemini, Claude, Tất cả)">Affinity: ' + esc((acc.affinity || "all").toUpperCase()) + '</span>' +
             '<span class="chip-interactive" data-action="toggleRole" data-email="' + esc(email) + '" data-role="' + esc(acc.role || "primary") + '" title="Chuyển vai trò pool (Primary, Backup, Standby)">Role: ' + esc((acc.role || "primary").toUpperCase()) + '</span>' +
@@ -590,6 +699,21 @@ export function getClientScript(): string {
     } else if (act === "togglePrivacy") {
       hideEmail = !hideEmail;
       post("updateConfig", { hideEmail: hideEmail });
+    } else if (act === "setQuotaMode") {
+      var qm = actionEl.getAttribute("data-mode");
+      if (qm) {
+        if (!state) state = {};
+        if (!state.config) state.config = {};
+        state.config.quotaMode = qm;
+        var pBtns = document.querySelectorAll(".mode-pill");
+        pBtns.forEach(function(b) {
+          if (b.getAttribute("data-mode") === qm) b.classList.add("active");
+          else b.classList.remove("active");
+        });
+        post("setQuotaMode", qm);
+        renderSpotlight();
+        renderAccountDeck();
+      }
     } else if (act === "selectAccount") {
       var emailSel = actionEl.getAttribute("data-email");
       if (emailSel) {
