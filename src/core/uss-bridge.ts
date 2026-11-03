@@ -80,7 +80,7 @@ export function updateAntigravityLastLogin(email: string): boolean {
             if (storage["agy.onboarding.lastLoginUsername"] !== email) {
               storage["agy.onboarding.lastLoginUsername"] = email;
               data["antigravity-storage"] = storage;
-              db.prepare("UPDATE ItemTable SET value = ? WHERE key = 'google.google-antigravity'").run(JSON.stringify(data));
+              db.prepare("UPDATE ItemTable SET value = ? WHERE key = 'google.google-antigravity'").run?.(JSON.stringify(data));
             }
           }
         });
