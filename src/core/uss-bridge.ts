@@ -23,6 +23,7 @@ interface AntigravityUSS {
   };
   UserStatus?: {
     getUserStatus?: () => Promise<Uint8Array | string | null>;
+    clearUserStatus?: () => Promise<void>;
     restartUserStatusUpdater?: () => void;
     updateUserStatus?: () => void;
     refresh?: () => void;
@@ -83,7 +84,7 @@ export function updateAntigravityLastLogin(email: string): boolean {
               db.prepare("UPDATE ItemTable SET value = ? WHERE key = 'google.google-antigravity'").run?.(JSON.stringify(data));
             }
           }
-        });
+        }, false);
         return true;
       }
     }
@@ -139,6 +140,7 @@ export const USSBridge = {
 
         const us = api.UserStatus;
         if (us) {
+          try { await us.clearUserStatus?.(); } catch { /* ignore */ }
           try { us.updateUserStatus?.(); } catch { /* ignore */ }
           try { us.refresh?.(); } catch { /* ignore */ }
           try { us.sync?.(); } catch { /* ignore */ }

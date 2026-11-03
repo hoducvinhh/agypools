@@ -1,6 +1,5 @@
 import * as fs from "node:fs";
-import * as path from "node:path";
-import { CONV_DIR, withSqliteDb } from "./sqlite-utils.js";
+import { resolveConversationDb, withSqliteDb } from "./sqlite-utils.js";
 
 export interface GenTurnMetrics {
   idx: number;
@@ -44,8 +43,9 @@ interface ProtoField {
   value: number | string | Map<number, ProtoField[]>;
 }
 
-function decodeMessage(buf: Buffer, start: number, end: number): Map<number, ProtoField[]> {
+function decodeMessage(buf: Buffer, start: number, end: number, depth = 0): Map<number, ProtoField[]> {
   const fields = new Map<number, ProtoField[]>();
+  if (depth > 3) return fields;
   let pos = start;
   while (pos < end) {
     const tag = decodeVarint(buf, pos);
@@ -65,13 +65,18 @@ function decodeMessage(buf: Buffer, start: number, end: number): Map<number, Pro
       const len = decodeVarint(buf, pos);
       if (!len) break;
       pos = len.offset;
-      const sub = buf.subarray(pos, pos + len.value);
+      const subEnd = pos + len.value;
+      if (subEnd > end) break;
+      const sub = buf.subarray(pos, subEnd);
       const arr = fields.get(fieldNum) ?? [];
-      const printable = sub.length < 300 && sub.every((b: number) => (b >= 0x20 && b <= 0x7e) || b === 0x0a || b === 0x0d);
-      if (printable) {
-        arr.push({ type: "string", value: sub.toString("utf-8") });
+      if ((fieldNum === 1 || fieldNum === 4 || fieldNum === 15) && depth < 3) {
+        try {
+          arr.push({ type: "message", value: decodeMessage(buf, pos, subEnd, depth + 1) });
+        } catch {
+          arr.push({ type: "string", value: sub.toString("utf-8") });
+        }
       } else {
-        arr.push({ type: "message", value: decodeMessage(buf, pos, pos + len.value) });
+        arr.push({ type: "string", value: sub.length < 500 ? sub.toString("utf-8") : "" });
       }
       fields.set(fieldNum, arr);
       pos += len.value;
@@ -135,7 +140,7 @@ function parseTurnFromBlob(buf: Buffer): GenTurnMetrics | null {
   const modelId = getVarint(tokenMsg, 1);
   const newInputTokens = getVarint(tokenMsg, 2);
   const outputTokens = getVarint(tokenMsg, 3);
-  const cachedInputTokens = getVarint(tokenMsg, 5);
+  const cachedInputTokens = getVarint(tokenMsg, 5) || getVarint(tokenMsg, 6);
   const thinkingTokens = getVarint(tokenMsg, 9);
   const contentTokens = getVarint(tokenMsg, 10);
   const requestId = getString(tokenMsg, 11);
@@ -164,8 +169,8 @@ function parseTurnFromBlob(buf: Buffer): GenTurnMetrics | null {
 interface GenRow { idx: number; data?: Uint8Array | Buffer }
 
 function queryGenRows(conversationId: string, sinceIdx?: number): GenRow[] {
-  const dbPath = path.join(CONV_DIR, `${conversationId}.db`);
-  if (!fs.existsSync(dbPath)) return [];
+  const dbPath = resolveConversationDb(conversationId);
+  if (!dbPath || !fs.existsSync(dbPath)) return [];
 
   const rows = withSqliteDb(dbPath, (db) => {
     return sinceIdx !== undefined

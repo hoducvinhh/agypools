@@ -333,11 +333,14 @@ export class TokenManager {
     try {
       await prevLock.catch(() => {});
       const target = this.accounts.find((a) => a.email.toLowerCase() === email.toLowerCase());
-      if (!target || target.status === "disabled") return null;
+      if (!target) return null;
+      if (target.status === "disabled") {
+        target.status = "active";
+      }
       this.activeEmail = target.email;
       await this.context.globalState.update(KEY_ACTIVE, this.activeEmail);
       await this.persist();
-      await this.syncActiveTokenToUss();
+      await this.syncActiveTokenToUss(true);
       this.onAccountChangeEmitter.fire();
       this.log(`Active account switched to: ${this.activeEmail}`);
       return target;
