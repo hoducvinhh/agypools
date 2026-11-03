@@ -174,6 +174,12 @@ export function getClientScript(): string {
       claudeResetEl.textContent = fmtTime(cResetIso);
       claudeResetEl.setAttribute("data-reset", cResetIso || "");
     }
+
+    var rotateBtn = document.getElementById("btn-force-rotate") || document.querySelector('[data-action="forceRotate"]');
+    if (rotateBtn) {
+      rotateBtn.textContent = "⚡ Luân Chuyển";
+      rotateBtn.removeAttribute("disabled");
+    }
   }
 
   // ==================== RENDER ACCOUNT DECK ====================
@@ -571,8 +577,16 @@ export function getClientScript(): string {
     } else if (act === "refreshAll") {
       post("refreshQuotas");
     } else if (act === "forceRotate") {
-      actionEl.textContent = "⏳ Đang đổi...";
+      var btn = actionEl;
+      btn.textContent = "⏳ Đang kiểm tra...";
+      btn.setAttribute("disabled", "true");
       post("forceRotate");
+      setTimeout(function() {
+        if (btn) {
+          btn.textContent = "⚡ Luân Chuyển";
+          btn.removeAttribute("disabled");
+        }
+      }, 2500);
     } else if (act === "togglePrivacy") {
       hideEmail = !hideEmail;
       post("updateConfig", { hideEmail: hideEmail });

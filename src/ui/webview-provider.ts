@@ -146,11 +146,18 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
             await this.quotaMonitor.pollAllAccounts();
             this.refresh();
             break;
-          case "forceRotate":
+          case "forceRotate": {
             await this.quotaMonitor.pollAllAccounts();
-            await this.tokenManager.autoSelectHighestQuota(this.quotaMonitor.getAllQuotas(), "manual_force_rotate");
+            const rotated = await this.tokenManager.autoSelectHighestQuota(this.quotaMonitor.getAllQuotas(), "manual_force_rotate");
+            if (rotated) {
+              void vscode.window.showInformationMessage(`AgyPool: Đã luân chuyển sang ${rotated.email}`);
+            } else {
+              const active = this.tokenManager.getActiveAccount();
+              void vscode.window.showInformationMessage(`AgyPool: Tài khoản ${active?.email || "hiện tại"} đang có quota tối ưu nhất!`);
+            }
             this.postState();
             break;
+          }
           case "selectAccount":
             if (message.payload) {
               await this.tokenManager.selectAccount(message.payload);

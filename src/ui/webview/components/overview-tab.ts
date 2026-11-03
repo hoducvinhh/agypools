@@ -49,7 +49,7 @@ export function renderOverviewTab(): string {
     <div class="spotlight-actions">
       <div style="display:flex;gap:4px;">
         <button class="btn btn-primary" data-action="addAccount" title="Đăng nhập thêm tài khoản Google">+ Thêm Account</button>
-        <button class="btn btn-sec" data-action="forceRotate" title="Chuyển ngay sang tài khoản có quota tốt nhất">⚡ Luân Chuyển</button>
+        <button class="btn btn-sec" data-action="forceRotate" id="btn-force-rotate" title="Chuyển ngay sang tài khoản có quota tốt nhất">⚡ Luân Chuyển</button>
       </div>
       <button class="btn btn-sec" data-action="togglePrivacy" id="btn-privacy-toggle" title="Ẩn/Hiện địa chỉ email">Ẩn Email</button>
     </div>
