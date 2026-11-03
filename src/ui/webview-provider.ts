@@ -277,17 +277,17 @@ body {
   gap: 8px;
 }
 .brand-logo {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #10b981, #0284c7);
-  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: rgba(14, 20, 34, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 13px;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.35);
+  flex-shrink: 0;
 }
 .brand-title {
   font-size: 12px;
@@ -751,9 +751,15 @@ body {
   <!-- Brand Banner -->
   <div class="brand-header">
     <div class="brand-left">
-      <div class="brand-logo">⚡</div>
+      <div class="brand-logo" title="AgyPool">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" stroke="#38bdf8" />
+          <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(30 12 12)" stroke="#a855f7" stroke-dasharray="3 2" />
+          <circle cx="12" cy="12" r="2.8" fill="#10b981" />
+        </svg>
+      </div>
       <div>
-        <div class="brand-title">ACCOUNT POOL</div>
+        <div class="brand-title">AGYPOOL</div>
         <div class="brand-sub">Hồ Đức Vinh • Antigravity Edition</div>
       </div>
     </div>
