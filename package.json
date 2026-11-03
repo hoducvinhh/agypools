@@ -1,0 +1,163 @@
+{
+  "name": "agypool",
+  "displayName": "AgyPool - Antigravity Account Pool",
+  "description": "Smart Multi-Account Pool & Quota Manager for Antigravity with Auto-Switching to Highest Quota.",
+  "version": "1.4.2",
+  "publisher": "hoducvinhh",
+  "author": "hoducvinhh",
+  "license": "MIT",
+  "icon": "resources/icon.png",
+  "homepage": "https://github.com/hoducvinhh/agypools",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoducvinhh/agypools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hoducvinhh/agypools/issues"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "antigravity",
+    "agypool",
+    "google",
+    "gemini",
+    "multi-account",
+    "rotation",
+    "quota"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "extensionKind": [
+    "ui"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "agypool",
+          "title": "AgyPool",
+          "icon": "resources/agypool-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "agypool": [
+        {
+          "id": "agypool.accounts",
+          "name": "AgyPool & Quotas",
+          "type": "webview",
+          "icon": "resources/agypool-icon.svg"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "AgyPool",
+      "properties": {
+        "agypool.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable AgyPool multi-account rotation."
+        },
+        "agypool.rotationStrategy": {
+          "type": "string",
+          "enum": [
+            "auto_highest",
+            "cache_optimized",
+            "round_robin"
+          ],
+          "enumDescriptions": [
+            "Always pick the account with the highest available quota",
+            "Stay on the active account until its quota drops below 15% to preserve prompt cache hits",
+            "Cycle sequentially through healthy accounts"
+          ],
+          "default": "auto_highest",
+          "description": "Account rotation strategy."
+        },
+        "agypool.hideEmail": {
+          "type": "boolean",
+          "default": false,
+          "description": "Mask Google account email addresses in the status bar and notifications."
+        },
+        "agypool.endpointOverride": {
+          "type": "string",
+          "default": "",
+          "description": "Custom Cloud Code PA endpoint URL override. Leave empty to use auto-detect with dual-endpoint fallback."
+        },
+        "agypool.pollIntervalSeconds": {
+          "type": "number",
+          "default": 60,
+          "minimum": 15,
+          "description": "Active quota polling interval in seconds (backs off to 5 minutes when editor is idle)."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "agypool.openPanel",
+        "title": "AgyPool: Open Management Panel"
+      },
+      {
+        "command": "agypool.enable",
+        "title": "AgyPool: Enable Extension"
+      },
+      {
+        "command": "agypool.disable",
+        "title": "AgyPool: Disable Extension"
+      },
+      {
+        "command": "agypool.addAccount",
+        "title": "AgyPool: Add Google Account"
+      },
+      {
+        "command": "agypool.refreshQuotas",
+        "title": "AgyPool: Refresh All Quotas"
+      },
+      {
+        "command": "agypool.exportPool",
+        "title": "AgyPool: Export Account Pool (Encrypted)"
+      },
+      {
+        "command": "agypool.importPool",
+        "title": "AgyPool: Import Account Pool"
+      },
+      {
+        "command": "agypool.quickStatus",
+        "title": "AgyPool: Quick Status & Account Switcher"
+      },
+      {
+        "command": "agypool.installAntigravityHook",
+        "title": "AgyPool: Register Antigravity PreInvocation Hook"
+      },
+      {
+        "command": "agypool.removeAntigravityHook",
+        "title": "AgyPool: Remove Antigravity PreInvocation Hook"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "node esbuild.js",
+    "compile:prod": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --config oxlint.config.mjs",
+    "package": "bun run compile:prod && vsce package --no-dependencies --no-rewrite-relative-links"
+  },
+  "devDependencies": {
+    "@oxlint/plugins": "^1.85.0",
+    "@types/node": "^26.6.2",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.28.2",
+    "oxlint": "^1.85.0",
+    "typescript": "^7.0.2"
+  }
+}
