@@ -511,72 +511,81 @@ body {
   flex: 1;
 }
 .acc-avatar-sm {
-  width: 19px;
-  height: 19px;
-  border-radius: 5px;
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
   background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
   color: #fff;
-  font-size: 8.5px;
+  font-size: 11px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 .acc-card-nexus.is-active .acc-avatar-sm {
   background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 .acc-headline {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  gap: 1px;
+  gap: 2px;
 }
 .acc-name-txt {
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.2px;
 }
 .acc-mini-bars {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
 }
 .mini-bar-unit {
   display: flex;
   align-items: center;
-  gap: 3px;
-  font-size: 7.5px;
+  gap: 4px;
+  font-size: 11px;
   font-family: var(--font-mono);
+  font-weight: 700;
 }
 .mini-bar-track {
-  width: 26px;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
+  display: inline-block;
+  vertical-align: middle;
+  width: 44px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 .mini-bar-fill {
+  display: block;
   height: 100%;
-  border-radius: 2px;
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 
 .summary-right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   flex-shrink: 0;
 }
 .btn-switch-sm {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.18);
   color: var(--accent-emerald);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  border-radius: 4px;
-  padding: 1px 4px;
-  font-size: 8.5px;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 10px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.12s ease;
@@ -584,11 +593,13 @@ body {
 .btn-switch-sm:hover {
   background: var(--accent-emerald);
   color: #fff;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 .drawer-toggle-icon {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--text-muted);
   transition: transform 0.2s ease;
+  padding: 2px;
 }
 .acc-card-nexus.expanded .drawer-toggle-icon {
   transform: rotate(180deg);
@@ -609,21 +620,23 @@ body {
 .drawer-meta-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: 4px;
 }
 .chip-interactive {
-  font-size: 8px;
+  font-size: 9.5px;
   font-family: var(--font-mono);
-  padding: 1px 4px;
-  border-radius: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
   color: var(--text-dim);
   cursor: pointer;
+  transition: all 0.12s ease;
 }
 .chip-interactive:hover {
   background: rgba(255, 255, 255, 0.1);
   color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 .chip-interactive.err {
   background: rgba(244, 63, 94, 0.15);
@@ -633,14 +646,14 @@ body {
 .model-chips-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 3px;
-  margin-top: 2px;
+  gap: 4px;
+  margin-top: 3px;
 }
 .chip-model {
-  font-size: 7.5px;
+  font-size: 9px;
   font-family: var(--font-mono);
-  padding: 1px 4px;
-  border-radius: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--glass-border);
   color: var(--text-dim);

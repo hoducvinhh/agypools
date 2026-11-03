@@ -4,6 +4,7 @@ import * as path from "node:path";
 import * as vscode from "vscode";
 import type { OAuthTokens } from "../types.js";
 import { withSqliteDb } from "./sqlite-utils.js";
+import { getWindowsCredentialEmail, writeWindowsCredential } from "./wincred.js";
 
 export interface ClientCredentials {
   clientId: string;
@@ -119,17 +120,19 @@ export const USSBridge = {
     try {
       if (email) {
         updateAntigravityLastLogin(email);
+        writeWindowsCredential(token, email);
       }
       const api = getApi();
       const pref = api?.OAuthPreferences;
-      if (!pref?.setOAuthTokenInfo) return false;
-      await pref.setOAuthTokenInfo({
-        accessToken: token.accessToken,
-        refreshToken: token.refreshToken || "",
-        expiryDateSeconds: token.expiryDateSeconds || Math.floor(Date.now() / 1000) + 3600,
-        tokenType: token.tokenType || "Bearer",
-        isGcpTos: token.isGcpTos ?? false,
-      });
+      if (pref?.setOAuthTokenInfo) {
+        await pref.setOAuthTokenInfo({
+          accessToken: token.accessToken,
+          refreshToken: token.refreshToken || "",
+          expiryDateSeconds: token.expiryDateSeconds || Math.floor(Date.now() / 1000) + 3600,
+          tokenType: token.tokenType || "Bearer",
+          isGcpTos: token.isGcpTos ?? false,
+        });
+      }
 
       if (api) {
         try { api.sync?.(); } catch { /* ignore */ }
@@ -154,6 +157,7 @@ export const USSBridge = {
         "antigravity.syncState",
         "antigravity.getUserStatus",
         "antigravity.internal.getAuthStatus",
+        "antigravity.resetConversationState",
         "jetski.refresh",
       ]) {
         try { void vscode.commands.executeCommand(cmd); } catch { /* ignore */ }
@@ -193,6 +197,9 @@ export const USSBridge = {
 
   async getIdeEmail(tokenMatcher?: (token: string) => string | null): Promise<string | null> {
     try {
+      const winEmail = getWindowsCredentialEmail();
+      if (winEmail) return winEmail;
+
       const token = await this.getOAuthToken();
       if (token?.accessToken) {
         const fromToken = await this.getEmailFromToken(token.accessToken, tokenMatcher);

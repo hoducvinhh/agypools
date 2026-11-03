@@ -18,6 +18,9 @@
   "engines": {
     "vscode": "^1.85.0"
   },
+  "enabledApiProposals": [
+    "antigravityUnifiedStateSync"
+  ],
   "categories": [
     "Other",
     "Programming Languages",

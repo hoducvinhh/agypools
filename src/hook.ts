@@ -28,7 +28,7 @@ export async function runHook(): Promise<void> {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: rawInput || "{}",
-      signal: AbortSignal.timeout(500),
+      signal: AbortSignal.timeout(4000),
     });
 
     if (res.ok) {

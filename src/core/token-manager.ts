@@ -509,12 +509,30 @@ export class TokenManager {
       ? activeInfo.percent + (isActiveImminent ? 1000 : 0) + activeTierBonus / 10
       : -1;
 
-    if (
-      !bestAcc ||
-      bestPct <= 0 ||
-      bestAcc.email.toLowerCase() === activeEmail ||
-      (!isRateLimitFailover && bestScore <= activeScore)
-    ) {
+    const ideEmail = (await USSBridge.getIdeEmail())?.toLowerCase() || null;
+    const isIdeDesynced = Boolean(ideEmail && ideEmail !== activeEmail);
+
+    if (!bestAcc || bestPct <= 0) {
+      if (activeAcc && isIdeDesynced) {
+        this.log(`[AutoRotate] Forcing sync to active account ${activeAcc.email} (IDE currently on ${ideEmail})`);
+        return this.selectAccount(activeAcc.email);
+      }
+      return null;
+    }
+
+    if (bestAcc.email.toLowerCase() === activeEmail) {
+      if (isIdeDesynced || this.lastSyncedEmail?.toLowerCase() !== activeEmail) {
+        this.log(`[AutoRotate] Best account ${bestAcc.email} matches active pool account, but IDE is on ${ideEmail || "unknown"}. Re-syncing credentials...`);
+        return this.selectAccount(bestAcc.email);
+      }
+      return null;
+    }
+
+    if (!isRateLimitFailover && bestScore <= activeScore) {
+      if (isIdeDesynced || this.lastSyncedEmail?.toLowerCase() !== activeEmail) {
+        this.log(`[AutoRotate] Re-syncing active account ${activeEmail} to IDE (IDE currently on ${ideEmail || "unknown"})...`);
+        return this.selectAccount(activeEmail);
+      }
       return null;
     }
 
@@ -630,7 +648,10 @@ export class TokenManager {
     if (!active) return;
     try {
       const token = await this.getValidAccessToken(active);
-      if (!force && this.lastSyncedEmail === active.email && this.lastSyncedToken === token) {
+      const ideEmail = (await USSBridge.getIdeEmail())?.toLowerCase();
+      const isDesynced = Boolean(ideEmail && ideEmail !== active.email.toLowerCase());
+
+      if (!force && !isDesynced && this.lastSyncedEmail === active.email && this.lastSyncedToken === token) {
         return;
       }
       this.lastSyncedEmail = active.email;

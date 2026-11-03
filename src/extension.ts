@@ -263,11 +263,19 @@ export function activate(context: vscode.ExtensionContext): ExtensionExports {
       log("Activating Antigravity Account Pool...");
       if (tokenManager) await tokenManager.initialize();
       quotaMonitor?.initialize();
+      HookServer.registerGlobalHook(context.extensionPath);
       const activeAcc = tokenManager?.getActiveAccount();
       const initQuota = activeAcc && quotaMonitor ? quotaMonitor.getQuota(activeAcc.email) : null;
       statusBar?.updateAccount(tokenManager?.getActiveEmail() || "", activeAcc?.tier || "unknown", tokenManager?.isExtensionEnabled() ?? true, initQuota);
       webviewProvider?.refresh();
       await syncIdeAuth();
+      if (tokenManager) {
+        await tokenManager.syncActiveTokenToUss(true);
+        if (quotaMonitor) {
+          await quotaMonitor.pollAllAccounts();
+          await tokenManager.autoSelectHighestQuota(quotaMonitor.getAllQuotas(), "startup");
+        }
+      }
     } catch (err: unknown) {
       log(`Account Pool background init error: ${err instanceof Error ? err.message : String(err)}`);
     }

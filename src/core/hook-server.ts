@@ -4,6 +4,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import type { QuotaMonitor } from "./quota-monitor.js";
 import type { TokenManager } from "./token-manager.js";
+import { USSBridge } from "./uss-bridge.js";
 
 export const DEFAULT_HOOK_PORT = 27182;
 
@@ -45,13 +46,19 @@ export class HookServer {
               this.quotaMonitor.notifyActivity?.();
 
               const targetModel = payload.modelName || "";
-              const rotated = await this.tokenManager.autoSelectHighestQuota(
+              let rotated = await this.tokenManager.autoSelectHighestQuota(
                 this.quotaMonitor.getAllQuotas(),
                 "PreInvocation Hook",
                 targetModel,
               );
 
               const activeEmail = this.tokenManager.getActiveEmail();
+              const ideEmail = (await USSBridge.getIdeEmail())?.toLowerCase();
+              if (!rotated && activeEmail && ideEmail && ideEmail !== activeEmail.toLowerCase()) {
+                this.log(`[PreInvocation] IDE account (${ideEmail}) != active pool account (${activeEmail}). Enforcing sync...`);
+                rotated = await this.tokenManager.selectAccount(activeEmail);
+              }
+
               if (rotated) {
                 const eff = this.tokenManager.getEffectiveQuota(
                   rotated.email,
@@ -65,7 +72,7 @@ export class HookServer {
                     email: rotated.email,
                     percent: eff.percent,
                     model: targetModel,
-                    activeEmail,
+                    activeEmail: rotated.email,
                   }),
                 );
               } else {
