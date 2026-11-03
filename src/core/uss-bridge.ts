@@ -1,5 +1,9 @@
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import type { OAuthTokens } from "../types.js";
+import { withSqliteDb } from "./sqlite-utils.js";
 
 export interface ClientCredentials {
   clientId: string;
@@ -58,6 +62,35 @@ export function decodeBase64Url(str: string): Buffer {
   return Buffer.from(base64, "base64");
 }
 
+export function updateAntigravityLastLogin(email: string): boolean {
+  try {
+    const candidates = [
+      path.join(process.env.APPDATA || "", "Antigravity IDE", "User", "globalStorage", "state.vscdb"),
+      path.join(process.env.APPDATA || "", "Antigravity", "User", "globalStorage", "state.vscdb"),
+      path.join(os.homedir(), "Library", "Application Support", "Antigravity IDE", "User", "globalStorage", "state.vscdb"),
+      path.join(os.homedir(), ".config", "Antigravity IDE", "User", "globalStorage", "state.vscdb"),
+    ];
+    for (const p of candidates) {
+      if (fs.existsSync(p)) {
+        withSqliteDb(p, (db) => {
+          const row = db.prepare("SELECT value FROM ItemTable WHERE key = 'google.google-antigravity'").get<{ value: string }>();
+          if (row?.value) {
+            const data = JSON.parse(row.value) as Record<string, unknown>;
+            const storage = (data["antigravity-storage"] || {}) as Record<string, unknown>;
+            if (storage["agy.onboarding.lastLoginUsername"] !== email) {
+              storage["agy.onboarding.lastLoginUsername"] = email;
+              data["antigravity-storage"] = storage;
+              db.prepare("UPDATE ItemTable SET value = ? WHERE key = 'google.google-antigravity'").run(JSON.stringify(data));
+            }
+          }
+        });
+        return true;
+      }
+    }
+  } catch { /* ignore */ }
+  return false;
+}
+
 export const USSBridge = {
   getClientCredentials(): ClientCredentials {
     try {
@@ -81,8 +114,11 @@ export const USSBridge = {
     }
   },
 
-  async setOAuthToken(token: OAuthTokens): Promise<boolean> {
+  async setOAuthToken(token: OAuthTokens, email?: string): Promise<boolean> {
     try {
+      if (email) {
+        updateAntigravityLastLogin(email);
+      }
       const api = getApi();
       const pref = api?.OAuthPreferences;
       if (!pref?.setOAuthTokenInfo) return false;

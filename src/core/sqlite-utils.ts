@@ -82,6 +82,7 @@ export type SqliteValue = string | number | bigint | Uint8Array | Buffer | null 
 export interface SqliteStatement {
   all: <T = Record<string, SqliteValue>>(param?: SqliteParam) => T[];
   get: <T = Record<string, SqliteValue>>(param?: SqliteParam) => T | undefined;
+  run?: (param?: SqliteParam) => { changes?: number };
 }
 
 export interface SqliteDb {

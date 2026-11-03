@@ -638,7 +638,7 @@ export class TokenManager {
         expiryDateSeconds: active.tokenExpiresAt,
         tokenType: "Bearer",
         isGcpTos: false,
-      });
+      }, active.email);
       void (async () => {
         try {
           const override = this.config.endpointOverride?.trim();
