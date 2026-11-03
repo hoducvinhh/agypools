@@ -3,7 +3,7 @@
 # AgyPool - Antigravity Account Pool & Quota Manager
 
 ### Smart Multi-Account Pool & Quota Manager for Google Antigravity
-**Tác giả: hoducvinhh (Hồ Đức Vinh)**
+**
 
 [![License](https://img.shields.io/badge/License-MIT-00b4d8?style=flat-square)](LICENSE)
 
