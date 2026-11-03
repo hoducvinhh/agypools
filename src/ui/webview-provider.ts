@@ -35,7 +35,7 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
     private readonly logManager: LogManager,
     private readonly statsManager?: StatsManager,
     private readonly usageTracker?: UsageTracker,
-  ) {}
+  ) { }
 
   public resolveWebviewView(webviewView: vscode.WebviewView): void {
     this.view = webviewView;
@@ -760,7 +760,7 @@ body {
       </div>
       <div>
         <div class="brand-title">AGYPOOL</div>
-        <div class="brand-sub">Hồ Đức Vinh • Antigravity Edition</div>
+        <div class="brand-sub">Hồ Đức Vinh • hoducvinhh - Antigravity edition</div>
       </div>
     </div>
     <div class="brand-right">
@@ -844,7 +844,7 @@ body {
       <div class="brand-logo" style="background:linear-gradient(135deg, #a855f7, #38bdf8);">📈</div>
       <div>
         <div class="brand-title">TOKEN ANALYTICS</div>
-        <div class="brand-sub">Hồ Đức Vinh • Antigravity Edition</div>
+        <div class="brand-sub">Hồ Đức Vinh • hoducvinhh - Antigravity edition</div>
       </div>
     </div>
     <button class="btn btn-sec" data-action="nav" data-view="home">&larr; Quay Lại</button>
