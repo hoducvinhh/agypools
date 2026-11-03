@@ -18,3 +18,5 @@ resources/icon.svg
 resources/ss*.png
 .agents/**
 test/**
+.env*
+

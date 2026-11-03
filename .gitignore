@@ -1,13 +1,26 @@
+# Dependencies
 node_modules/
+
+# Build outputs & Packaged extensions (.vsix)
 dist/
+out/
 *.vsix
+*.map
+
+# Temporary files & Logs
 *.log
 *.tmp
 .DS_Store
 Thumbs.db
+scratch/
+
+# IDE & Testing
 .gemini/
 .agents/
 .vscode-test/
 tools/
-resource/
 resources/
+
+# Secrets and environment variables
+.env
+.env.*
