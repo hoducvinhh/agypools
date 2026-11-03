@@ -12,7 +12,6 @@ import {
   type AgyPoolConfig,
   AgyPoolErrorCode,
   type PoolRole,
-  type QuotaMode,
   type RotationStrategy,
 } from "../types.js";
 import { OAuthFlow } from "./oauth-flow.js";
@@ -354,30 +353,16 @@ export class TokenManager {
     email: string,
     quotas: Record<string, AccountQuota>,
     targetModel?: string,
-    overrideMode?: QuotaMode,
   ): EffectiveQuota {
     const q = quotas[email.toLowerCase()];
     if (!q?.families || q.families.length === 0) return { percent: -1, resetTs: Infinity };
 
-    const strategy = this.config.rotationStrategy || "auto_highest";
-    const mode: QuotaMode = overrideMode || this.config.quotaMode || (strategy === "auto_highest_weekly" ? "weekly" : strategy === "balanced" ? "balanced" : "5h");
-
     const computePercent = (p5h: number, pWk: number): number => {
-      if (mode === "weekly") {
-        return p5h <= 0 ? 0 : pWk;
-      }
-      if (mode === "balanced") {
-        return Math.min(p5h, pWk);
-      }
       return pWk <= 0 ? 0 : p5h;
     };
 
-    const resolveResetTs = (r5h?: string, rWk?: string): number => {
+    const resolveResetTs = (r5h?: string): number => {
       const ts5h = r5h ? Date.parse(r5h) : Infinity;
-      const tsWk = rWk ? Date.parse(rWk) : Infinity;
-      if (mode === "weekly") {
-        return Number.isNaN(tsWk) ? (Number.isNaN(ts5h) ? Infinity : ts5h) : tsWk;
-      }
       return Number.isNaN(ts5h) ? Infinity : ts5h;
     };
 
@@ -399,7 +384,7 @@ export class TokenManager {
           const p5h = fam.limit5h?.percent ?? fam.percent ?? 100;
           const pWk = fam.limitWeekly?.percent ?? 100;
           const pct = computePercent(p5h, pWk);
-          const resetTs = resolveResetTs(fam.limit5h?.resetTime ?? fam.resetTime, fam.limitWeekly?.resetTime);
+          const resetTs = resolveResetTs(fam.limit5h?.resetTime ?? fam.resetTime);
           return { percent: pct, resetTs };
         }
         return { percent: 0, resetTs: Infinity };
@@ -412,7 +397,7 @@ export class TokenManager {
       const pWk = f.limitWeekly?.percent ?? 100;
       const pct = computePercent(p5h, pWk);
       minPct = Math.min(minPct, pct);
-      const resetTs = resolveResetTs(f.limit5h?.resetTime ?? f.resetTime, f.limitWeekly?.resetTime);
+      const resetTs = resolveResetTs(f.limit5h?.resetTime ?? f.resetTime);
       if (resetTs < minResetTs) minResetTs = resetTs;
     }
     return { percent: minPct, resetTs: minResetTs };
@@ -455,8 +440,7 @@ export class TokenManager {
     const activeMatchesAffinity = activeAcc ? matchesModelAffinity(activeAcc, famKey) : true;
     const activeIsFreeWhenPaidAvailable = activeAcc?.tier === "free" && hasUsablePaid;
     const strategy: RotationStrategy = this.config.rotationStrategy || "auto_highest";
-    const isHighestStrategy =
-      strategy === "auto_highest" || strategy === "auto_highest_weekly" || strategy === "balanced";
+    const isHighestStrategy = strategy === "auto_highest";
 
     // 4. Timing Priority (Predictive Drain Window):
     // Only applied in cache_optimized or round_robin modes when not forced.

@@ -77,12 +77,8 @@ export interface AccountQuota {
   lastUpdated: number;
 }
 
-export type QuotaMode = "5h" | "weekly" | "balanced";
-
 export type RotationStrategy =
   | "auto_highest"
-  | "auto_highest_weekly"
-  | "balanced"
   | "cache_optimized"
   | "round_robin";
 
@@ -90,7 +86,6 @@ export interface AgyPoolConfig {
   enabled: boolean;
   hideEmail?: boolean;
   rotationStrategy?: RotationStrategy;
-  quotaMode?: QuotaMode;
   endpointOverride?: string;
   pollIntervalSeconds?: number;
 }
