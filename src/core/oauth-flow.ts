@@ -28,11 +28,11 @@ function buildSuccessHtml(email: string): string {
   const initial = (email[0] || "A").toUpperCase();
 
   return `<!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgyPool — Kết Nối Thành Công</title>
+  <title>AgyPool — Connection Successful</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -279,8 +279,8 @@ function buildSuccessHtml(email: string): string {
       <span>AgyPool Engine</span>
     </div>
 
-    <h1>Ủy Quyền Thành Công!</h1>
-    <p class="desc">Tài khoản Google đã được kết nối an toàn vào Antigravity Account Pool.</p>
+    <h1>Authorization Successful!</h1>
+    <p class="desc">Google account connected securely to Antigravity Account Pool.</p>
 
     <div class="acc-card">
       <div class="avatar">${initial}</div>
@@ -290,23 +290,23 @@ function buildSuccessHtml(email: string): string {
           <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
             <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
           </svg>
-          Sẵn sàng luân chuyển Quota
+          Ready for Quota Rotation
         </div>
       </div>
     </div>
 
     <button class="btn-close" onclick="window.close()">
-      <span>Đóng Tab Này</span>
+      <span>Close This Tab</span>
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     </button>
 
-    <div class="auto-close">Tự động đóng sau <span id="sec">5</span> giây...</div>
+    <div class="auto-close">Auto closing in <span id="sec">5</span> seconds...</div>
 
     <div class="footer">
-      <span>AgyPool v1.4.3</span> • Tác giả: <span>hoducvinhh</span>
+      <span>AgyPool v1.4.3</span> • Author: <span>hoducvinhh</span>
     </div>
   </div>
 
@@ -329,11 +329,11 @@ function buildSuccessHtml(email: string): string {
 function buildErrorHtml(detail: string): string {
   const safeDetail = escapeHtml(detail);
   return `<!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgyPool — Kết Nối Thất Bại</title>
+  <title>AgyPool — Connection Failed</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -402,10 +402,10 @@ function buildErrorHtml(detail: string): string {
         <line x1="12" y1="16" x2="12.01" y2="16"></line>
       </svg>
     </div>
-    <h1>Ủy Quyền Thất Bại</h1>
-    <p>Không thể hoàn tất quá trình xác thực OAuth với Google.</p>
+    <h1>Authorization Failed</h1>
+    <p>Could not complete OAuth authentication with Google.</p>
     <div class="err-box">${safeDetail}</div>
-    <button class="btn" onclick="window.close()">Đóng Tab Này</button>
+    <button class="btn" onclick="window.close()">Close This Tab</button>
   </div>
 </body>
 </html>`;

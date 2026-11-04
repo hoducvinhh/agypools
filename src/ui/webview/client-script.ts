@@ -41,9 +41,9 @@ export function getClientScript(): string {
   }
 
   function fmtTime(iso) {
-    if (!iso) return "Sẵn sàng";
+    if (!iso) return "Ready";
     var d = new Date(iso).getTime() - Date.now();
-    if (d <= 0 || isNaN(d)) return "Sẵn sàng";
+    if (d <= 0 || isNaN(d)) return "Ready";
     var dt = new Date(iso);
     var hrsPad = ('0' + dt.getHours()).slice(-2);
     var minsPad = ('0' + dt.getMinutes()).slice(-2);
@@ -132,10 +132,10 @@ export function getClientScript(): string {
     var claudeWkResetEl = document.getElementById("spotlight-claude-weekly-reset");
 
     var privBtn = document.getElementById("btn-privacy-toggle");
-    if (privBtn) privBtn.textContent = hideEmail ? "Hiện Email" : "Ẩn Email";
+    if (privBtn) privBtn.textContent = hideEmail ? "Show Email" : "Hide Email";
 
     if (!activeAcc) {
-      if (emailEl) emailEl.textContent = "Chưa có tài khoản nào được kích hoạt";
+      if (emailEl) emailEl.textContent = "No active account";
       if (tierTagEl) tierTagEl.textContent = "STANDBY";
       if (roleTagEl) roleTagEl.textContent = "WAITING";
       if (healthTagEl) healthTagEl.innerHTML = "";
@@ -204,7 +204,7 @@ export function getClientScript(): string {
 
     var rotateBtn = document.getElementById("btn-force-rotate") || document.querySelector('[data-action="forceRotate"]');
     if (rotateBtn) {
-      rotateBtn.textContent = "⚡ Luân Chuyển";
+      rotateBtn.textContent = "⚡ Rotate";
       rotateBtn.removeAttribute("disabled");
     }
   }
@@ -220,7 +220,7 @@ export function getClientScript(): string {
     var config = (state && state.config) || {};
 
     if (!accounts.length) {
-      container.innerHTML = '<div class="empty-deck">Chưa có tài khoản nào trong pool.<br><br><button class="btn btn-primary" data-action="addAccount">+ Thêm Tài Khoản Đầu Tiên</button></div>';
+      container.innerHTML = '<div class="empty-deck">No accounts in pool.<br><br><button class="btn btn-primary" data-action="addAccount">+ Add First Account</button></div>';
       return;
     }
 
@@ -252,7 +252,7 @@ export function getClientScript(): string {
     });
 
     if (!filtered.length) {
-      container.innerHTML = '<div class="empty-deck">Không tìm thấy tài khoản phù hợp bộ lọc.</div>';
+      container.innerHTML = '<div class="empty-deck">No matching accounts found.</div>';
       return;
     }
 
@@ -294,11 +294,11 @@ export function getClientScript(): string {
       var claudeWkCls = claudeWkPct < 20 ? "danger" : claudeWkPct < 40 ? "warn" : "claude-7d";
 
       var switchBtn = (!isAct && !isDis)
-        ? '<button class="btn-switch-sm" data-action="selectAccount" data-email="' + esc(email) + '" title="Chuyển ngay sang tài khoản này">⚡ Switch</button>'
+        ? '<button class="btn-switch-sm" data-action="selectAccount" data-email="' + esc(email) + '" title="Switch to this account now">⚡ Switch</button>'
         : '';
 
       var reauthBtn = (acc.health && acc.health !== "healthy")
-        ? '<button class="chip-interactive err" data-action="reauthAccount" data-email="' + esc(email) + '" title="Đăng nhập lại để cập nhật token">⚠️ Re-Auth</button>'
+        ? '<button class="chip-interactive err" data-action="reauthAccount" data-email="' + esc(email) + '" title="Re-authenticate to refresh token">⚠️ Re-Auth</button>'
         : '';
 
       // Detailed Models Chips
@@ -378,23 +378,23 @@ export function getClientScript(): string {
             '</div>' +
           '</div>' +
           '<div class="drawer-meta-chips">' +
-            '<span class="chip-interactive" data-action="toggleAffinity" data-email="' + esc(email) + '" data-affinity="' + esc(acc.affinity || "all") + '" title="Chuyển model affinity (Gemini, Claude, Tất cả)">Affinity: ' + esc((acc.affinity || "all").toUpperCase()) + '</span>' +
-            '<span class="chip-interactive" data-action="toggleRole" data-email="' + esc(email) + '" data-role="' + esc(acc.role || "primary") + '" title="Chuyển vai trò pool (Primary, Backup, Standby)">Role: ' + esc((acc.role || "primary").toUpperCase()) + '</span>' +
-            '<span class="chip-interactive" data-action="editAlias" data-email="' + esc(email) + '" data-alias="' + esc(acc.alias || "") + '" title="Đặt bí danh hiển thị">Bí danh: ' + esc(acc.alias || "Đặt tên...") + '</span>' +
+            '<span class="chip-interactive" data-action="toggleAffinity" data-email="' + esc(email) + '" data-affinity="' + esc(acc.affinity || "all") + '" title="Toggle model affinity (Gemini, Claude, All)">Affinity: ' + esc((acc.affinity || "all").toUpperCase()) + '</span>' +
+            '<span class="chip-interactive" data-action="toggleRole" data-email="' + esc(email) + '" data-role="' + esc(acc.role || "primary") + '" title="Toggle pool role (Primary, Backup, Standby)">Role: ' + esc((acc.role || "primary").toUpperCase()) + '</span>' +
+            '<span class="chip-interactive" data-action="editAlias" data-email="' + esc(email) + '" data-alias="' + esc(acc.alias || "") + '" title="Set display alias">Alias: ' + esc(acc.alias || "Set alias...") + '</span>' +
             reauthBtn +
           '</div>' +
           modelsHtml +
           '<div class="drawer-actions-row">' +
             '<div style="display:flex;align-items:center;gap:4px;">' +
-              '<label class="switch" title="' + (isDis ? "Bật lại trong pool" : "Tạm ngưng trong pool") + '">' +
+              '<label class="switch" title="' + (isDis ? "Enable in pool" : "Disable in pool") + '">' +
                 '<input type="checkbox" ' + (isDis ? "" : "checked") + ' data-action="toggleAccount" data-email="' + esc(email) + '" />' +
                 '<span class="slider"></span>' +
               '</label>' +
-              '<span style="font-size:8px;color:var(--text-muted);">' + (isDis ? "Đang tắt" : "Đang bật") + '</span>' +
+              '<span style="font-size:8px;color:var(--text-muted);">' + (isDis ? "Disabled" : "Active") + '</span>' +
             '</div>' +
             '<div style="display:flex;gap:3px;">' +
-              '<button class="btn btn-sec btn-icon" data-action="refreshAccount" data-email="' + esc(email) + '" title="Làm mới quota riêng tài khoản này">&#x21bb;</button>' +
-              '<button class="btn btn-sec btn-icon" data-action="removeAccount" data-email="' + esc(email) + '" title="Xóa tài khoản khỏi pool" style="color:var(--rose-danger);">&times;</button>' +
+              '<button class="btn btn-sec btn-icon" data-action="refreshAccount" data-email="' + esc(email) + '" title="Refresh quota for this account">&#x21bb;</button>' +
+              '<button class="btn btn-sec btn-icon" data-action="removeAccount" data-email="' + esc(email) + '" title="Remove account from pool" style="color:var(--rose-danger);">&times;</button>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -432,7 +432,7 @@ export function getClientScript(): string {
 
     var data = rawData.filter(Boolean);
     if (!data.length) {
-      chartBox.innerHTML = '<div class="empty-deck">Chưa có dữ liệu tiêu thụ trong khoảng thời gian này.</div>';
+      chartBox.innerHTML = '<div class="empty-deck">No consumption data for this period.</div>';
       return;
     }
 
@@ -492,7 +492,7 @@ export function getClientScript(): string {
           '<div style="font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + esc(r.promptPreview || "") + '">' + esc(r.promptPreview || "Request") + '</div>' +
           '<div style="font-size:11px;font-weight:800;font-family:var(--font-mono);">' + fmtNum(r.totalTokens || 0) + ' <span style="font-size:8.5px;color:var(--cache-violet);">(' + rate + '%)</span></div>' +
         '</div>';
-      }).join("") : '<div class="empty-deck" style="width:100%;">Không có requests nào.</div>';
+      }).join("") : '<div class="empty-deck" style="width:100%;">No requests recorded.</div>';
     }
 
     // Models drill-down
@@ -512,9 +512,9 @@ export function getClientScript(): string {
         return '<div class="drill-card">' +
           '<div class="tag-badge tag-tier">' + esc(m.model) + '</div>' +
           '<div style="font-size:12px;font-weight:800;font-family:var(--font-mono);margin-top:2px;">' + fmtNum(m.total) + '</div>' +
-          '<div style="font-size:8px;color:var(--text-muted);">' + m.count + ' lượt gọi</div>' +
+          '<div style="font-size:8px;color:var(--text-muted);">' + m.count + ' calls</div>' +
         '</div>';
-      }).join("") : '<div class="empty-deck" style="width:100%;">Không có dữ liệu model.</div>';
+      }).join("") : '<div class="empty-deck" style="width:100%;">No model data available.</div>';
     }
 
     // Sessions drill-down
@@ -530,7 +530,7 @@ export function getClientScript(): string {
           '<div style="font-size:11px;font-weight:800;font-family:var(--font-mono);">' + fmtNum(c.totalTokens || 0) + ' tokens</div>' +
           '<div style="font-size:8px;color:var(--text-muted);">' + (c.turns || 0) + ' turns</div>' +
         '</div>';
-      }).join("") : '<div class="empty-deck" style="width:100%;">Không có session nào.</div>';
+      }).join("") : '<div class="empty-deck" style="width:100%;">No sessions recorded.</div>';
     }
   }
 
@@ -559,7 +559,7 @@ export function getClientScript(): string {
     });
 
     if (!filtered.length) {
-      container.innerHTML = '<div class="empty-deck">Không có nhật ký phù hợp bộ lọc.</div>';
+      container.innerHTML = '<div class="empty-deck">No logs matching filter.</div>';
       return;
     }
 
@@ -674,12 +674,12 @@ export function getClientScript(): string {
       post("refreshQuotas");
     } else if (act === "forceRotate") {
       var btn = actionEl;
-      btn.textContent = "⏳ Đang kiểm tra...";
+      btn.textContent = "⏳ Checking...";
       btn.setAttribute("disabled", "true");
       post("forceRotate");
       setTimeout(function() {
         if (btn) {
-          btn.textContent = "⚡ Luân Chuyển";
+          btn.textContent = "⚡ Rotate";
           btn.removeAttribute("disabled");
         }
       }, 2500);
@@ -718,7 +718,7 @@ export function getClientScript(): string {
     } else if (act === "editAlias") {
       var emailAlias = actionEl.getAttribute("data-email");
       var curAlias = actionEl.getAttribute("data-alias") || "";
-      var newAlias = prompt("Nhập bí danh mới cho " + emailAlias + ":", curAlias);
+      var newAlias = prompt("Enter new alias for " + emailAlias + ":", curAlias);
       if (newAlias !== null && emailAlias) {
         post("updateAccountMeta", { email: emailAlias, alias: newAlias.trim() });
       }
