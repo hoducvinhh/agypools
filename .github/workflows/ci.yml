@@ -70,7 +70,7 @@ jobs:
       - name: Publish to Open VSX
         run: |
           if [ -n "$OVSX_PAT" ]; then
-            bunx ovsx publish *.vsix --pat "$OVSX_PAT"
+            bunx ovsx publish *.vsix --pat "$OVSX_PAT" --skip-duplicate
           else
             echo "OVSX_PAT is not set. Skipping Open VSX publication."
           fi
