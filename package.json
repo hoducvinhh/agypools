@@ -2,7 +2,7 @@
   "name": "agypool",
   "displayName": "AgyPool - Antigravity Account Pool",
   "description": "Smart Multi-Account Pool & Quota Manager for Antigravity with Auto-Switching to Highest Quota.",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "publisher": "hoducvinhh",
   "author": "hoducvinhh",
   "license": "MIT",
@@ -153,7 +153,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --config oxlint.config.mjs",
     "package": "npm run compile:prod && vsce package --no-dependencies --no-rewrite-relative-links",
-    "publish:ovsx": "npm run compile:prod && ovsx publish --no-dependencies"
+    "publish:ovsx": "npm run compile:prod && npx ovsx publish --no-dependencies"
   },
   "devDependencies": {
     "@oxlint/plugins": "^1.85.0",
