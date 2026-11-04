@@ -150,10 +150,10 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
             await this.quotaMonitor.pollAllAccounts();
             const rotated = await this.tokenManager.autoSelectHighestQuota(this.quotaMonitor.getAllQuotas(), "manual_force_rotate");
             if (rotated) {
-              void vscode.window.showInformationMessage(`AgyPool: Đã luân chuyển sang ${rotated.email}`);
+              void vscode.window.showInformationMessage(`AgyPool: Rotated to ${rotated.email}`);
             } else {
               const active = this.tokenManager.getActiveAccount();
-              void vscode.window.showInformationMessage(`AgyPool: Tài khoản ${active?.email || "hiện tại"} đang có quota tối ưu nhất!`);
+              void vscode.window.showInformationMessage(`AgyPool: Account ${active?.email || "current"} already has the highest quota!`);
             }
             this.postState();
             break;
@@ -235,7 +235,7 @@ export class WebviewProvider implements vscode.WebviewViewProvider {
     const initialStateJson = JSON.stringify(this.getCurrentStateData()).replace(/</g, "\\u003c");
 
     return `<!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
