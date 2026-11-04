@@ -12,7 +12,7 @@ export function renderHeader(): string {
     <div class="brand-meta">
       <div class="brand-name">
         <span>AGYPOOL</span>
-        <span class="brand-ver-badge">v1.4.3</span>
+        <span class="brand-ver-badge">v1.4.4</span>
       </div>
       <div class="brand-sub">hoducvinhh • Antigravity</div>
     </div>

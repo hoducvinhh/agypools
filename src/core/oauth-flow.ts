@@ -306,7 +306,7 @@ function buildSuccessHtml(email: string): string {
     <div class="auto-close">Auto closing in <span id="sec">5</span> seconds...</div>
 
     <div class="footer">
-      <span>AgyPool v1.4.3</span> • Author: <span>hoducvinhh</span>
+      <span>AgyPool v1.4.4</span> • Author: <span>hoducvinhh</span>
     </div>
   </div>
 
