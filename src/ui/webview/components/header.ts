@@ -14,7 +14,7 @@ export function renderHeader(): string {
         <span>AGYPOOL</span>
         <span class="brand-ver-badge">v1.4.3</span>
       </div>
-      <div class="brand-sub">Hồ Đức Vinh • Antigravity</div>
+      <div class="brand-sub">hoducvinhh • Antigravity</div>
     </div>
   </div>
   <div class="brand-controls">
