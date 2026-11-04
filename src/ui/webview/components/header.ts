@@ -22,7 +22,7 @@ export function renderHeader(): string {
       <span class="pulse-dot"></span>
       <span id="pool-status-text">ONLINE</span>
     </span>
-    <label class="switch" title="Bật/Tắt Tự Động Quota Pool">
+    <label class="switch" title="Enable/Disable Automatic Quota Pool">
       <input type="checkbox" id="master-power-toggle" data-action="toggleMasterPower" checked />
       <span class="slider"></span>
     </label>

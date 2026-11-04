@@ -7,7 +7,7 @@ export function renderOverviewTab(): string {
       <div class="spotlight-title-row">
         <div class="spotlight-avatar" id="spotlight-avatar">G</div>
         <div class="spotlight-info">
-          <div class="spotlight-email" id="spotlight-email">Chưa chọn tài khoản</div>
+          <div class="spotlight-email" id="spotlight-email">No account selected</div>
           <div class="spotlight-tags">
             <span class="tag-badge tag-active" id="spotlight-role-tag">ACTIVE ENGINE</span>
             <span class="tag-badge tag-tier" id="spotlight-tier-tag">PRO</span>
@@ -16,7 +16,7 @@ export function renderOverviewTab(): string {
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:3px;">
-        <button class="btn btn-sec btn-icon" data-action="refreshAll" title="Làm mới toàn bộ quota">&#x21bb;</button>
+        <button class="btn btn-sec btn-icon" data-action="refreshAll" title="Refresh all quotas">&#x21bb;</button>
       </div>
     </div>
 
@@ -30,7 +30,7 @@ export function renderOverviewTab(): string {
         <div class="gauge-bar-track">
           <div class="gauge-bar-fill gemini" id="spotlight-gemini-bar" style="width: 100%;"></div>
         </div>
-        <div class="gauge-reset" id="spotlight-gemini-reset">Sẵn sàng</div>
+        <div class="gauge-reset" id="spotlight-gemini-reset">Ready</div>
       </div>
 
       <div class="gauge-item">
@@ -41,7 +41,7 @@ export function renderOverviewTab(): string {
         <div class="gauge-bar-track">
           <div class="gauge-bar-fill gemini" id="spotlight-gemini-weekly-bar" style="width: 100%;"></div>
         </div>
-        <div class="gauge-reset" id="spotlight-gemini-weekly-reset">Sẵn sàng</div>
+        <div class="gauge-reset" id="spotlight-gemini-weekly-reset">Ready</div>
       </div>
 
       <div class="gauge-item">
@@ -52,7 +52,7 @@ export function renderOverviewTab(): string {
         <div class="gauge-bar-track">
           <div class="gauge-bar-fill claude" id="spotlight-claude-bar" style="width: 100%;"></div>
         </div>
-        <div class="gauge-reset" id="spotlight-claude-reset">Sẵn sàng</div>
+        <div class="gauge-reset" id="spotlight-claude-reset">Ready</div>
       </div>
 
       <div class="gauge-item">
@@ -63,17 +63,17 @@ export function renderOverviewTab(): string {
         <div class="gauge-bar-track">
           <div class="gauge-bar-fill claude" id="spotlight-claude-weekly-bar" style="width: 100%;"></div>
         </div>
-        <div class="gauge-reset" id="spotlight-claude-weekly-reset">Sẵn sàng</div>
+        <div class="gauge-reset" id="spotlight-claude-weekly-reset">Ready</div>
       </div>
     </div>
 
     <!-- Spotlight Action Toolbar -->
     <div class="spotlight-actions">
       <div style="display:flex;gap:4px;">
-        <button class="btn btn-primary" data-action="addAccount" title="Đăng nhập thêm tài khoản Google">+ Thêm Account</button>
-        <button class="btn btn-sec" data-action="forceRotate" id="btn-force-rotate" title="Chuyển ngay sang tài khoản có quota tốt nhất">⚡ Luân Chuyển</button>
+        <button class="btn btn-primary" data-action="addAccount" title="Add Google account">+ Add Account</button>
+        <button class="btn btn-sec" data-action="forceRotate" id="btn-force-rotate" title="Switch immediately to account with highest quota">⚡ Rotate</button>
       </div>
-      <button class="btn btn-sec" data-action="togglePrivacy" id="btn-privacy-toggle" title="Ẩn/Hiện địa chỉ email">Ẩn Email</button>
+      <button class="btn btn-sec" data-action="togglePrivacy" id="btn-privacy-toggle" title="Toggle email visibility">Hide Email</button>
     </div>
   </div>
 
@@ -81,12 +81,12 @@ export function renderOverviewTab(): string {
   <div class="deck-filter-bar">
     <div class="search-input-box">
       <span class="search-icon">🔍</span>
-      <input type="text" class="search-input" id="search-accounts" placeholder="Tìm tài khoản, alias..." />
+      <input type="text" class="search-input" id="search-accounts" placeholder="Search account, alias..." />
     </div>
     <div style="display:flex;gap:2px;">
-      <button class="filter-chip active" data-filter="all">Tất cả</button>
-      <button class="filter-chip" data-filter="healthy">Khỏe</button>
-      <button class="filter-chip" data-filter="issue">Lỗi</button>
+      <button class="filter-chip active" data-filter="all">All</button>
+      <button class="filter-chip" data-filter="healthy">Healthy</button>
+      <button class="filter-chip" data-filter="issue">Issue</button>
     </div>
   </div>
 
